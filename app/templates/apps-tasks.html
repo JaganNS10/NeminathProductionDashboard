@@ -1,0 +1,932 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <meta name="author" content="theme_ocean">
+    <!--! The above 6 meta tags *must* come first in the head; any other head content must come *after* these tags !-->
+    <!--! BEGIN: Apps Title-->
+    <title>Neminath || Tasks</title>
+    <!--! END:  Apps Title-->
+    <!--! BEGIN: Favicon-->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/images/NWIPLogo.jpeg' %}" />
+    <!--! END: Favicon-->
+    <!--! BEGIN: Bootstrap CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <!--! END: Bootstrap CSS-->
+    <!--! BEGIN: Vendors CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendors/css/vendors.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendors/css/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendors/css/select2-theme.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendors/css/datepicker.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendors/css/quill.min.css' %}">
+    <!--! END: Vendors CSS-->
+    <!--! BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/theme.min.css' %}">
+    <!--! END: Custom CSS-->
+    <!--! HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries !-->
+    <!--! WARNING: Respond.js doesn"t work if you view the page via file: !-->
+    <!--[if lt IE 9]>
+			<script src="https:oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https:oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+    <style>
+        /* Success Message */
+        .success-message {
+            background: #ecfdf5;
+            color: #065f46;
+            border-left: 5px solid #10b981;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fef2f2;
+            color: #7f1d1d;
+            border-left: 5px solid #ef4444;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+        .badge-container .badge {
+            position: relative;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+
+        /* Tooltip text */
+        .badge-container .badge::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%; /* above the badge */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #065f46;
+            color: #fff;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        /* Tooltip arrow */
+        .badge-container .badge::before {
+            content: "";
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #065f46 transparent transparent transparent;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        /* Show tooltip on hover */
+        .badge-container .badge:hover::after,
+        .badge-container .badge:hover::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!--! ================================================================ !-->
+    <!--! [Start] Navigation Manu !-->
+    <!--! ================================================================ !-->
+    <nav class="nxl-navigation">
+        <div class="navbar-wrapper">
+            <div class="m-header">
+                <a href="{% url 'Home' %}" class="b-brand">
+                    
+                    <h2>NEMINATH</h2>
+                </a>
+            </div>
+            <div class="navbar-content">
+                <ul class="nxl-navbar">
+                    <li class="nxl-item nxl-caption">
+                        <label>Navigation</label>
+                    </li>
+                    <li class="nxl-item nxl-hasmenu">
+                        <a href="javascript:void(0);" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                            <span class="nxl-mtext">Dashboards</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                        </a>
+                        <ul class="nxl-submenu">
+                            <li class="nxl-item"><a class="nxl-link" href="{% url 'Home' %}">CRM</a></li>
+                            
+                        </ul>
+                    </li>
+                    
+                    <li class="nxl-item nxl-hasmenu">
+                        <a href="javascript:void(0);" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-send"></i></span>
+                            <span class="nxl-mtext">Applications</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                        </a>
+                        <ul class="nxl-submenu">
+
+                            <li class="nxl-item"><a class="nxl-link" href="{% url 'apps_tasks' %}">Tasks</a></li>
+
+                            
+                        </ul>
+                    </li>
+                    
+                  
+                    <li class="nxl-item nxl-hasmenu">
+                        <a href="javascript:void(0);" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-alert-circle"></i></span>
+                            <span class="nxl-mtext">Employee</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                        </a>
+                        <ul class="nxl-submenu">
+                            <li class="nxl-item"><a class="nxl-link" href="{% url 'leads' %}">Employee</a></li>
+                            
+                            <li class="nxl-item"><a class="nxl-link" href="{% url 'leads_create' %}">Employee Create</a></li>
+                        </ul>
+                    </li>
+                    
+
+                    
+                    
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </nav>
+    <!--! ================================================================ !-->
+    <!--! [End]  Navigation Manu !-->
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+    <!--! [Start] Header !-->
+    <!--! ================================================================ !-->
+    <header class="nxl-header">
+        <div class="header-wrapper">
+            <!--! [Start] Header Left !-->
+            <div class="header-left d-flex align-items-center gap-4">
+                <!--! [Start] nxl-head-mobile-toggler !-->
+                <a href="javascript:void(0);" class="nxl-head-mobile-toggler" id="mobile-collapse">
+                    <div class="hamburger hamburger--arrowturn">
+                        <div class="hamburger-box">
+                            <div class="hamburger-inner"></div>
+                        </div>
+                    </div>
+                </a>
+                <!--! [Start] nxl-head-mobile-toggler !-->
+                <!--! [Start] nxl-navigation-toggle !-->
+                <div class="nxl-navigation-toggle">
+                    <a href="javascript:void(0);" id="menu-mini-button">
+                        <i class="feather-align-left"></i>
+                    </a>
+                    <a href="javascript:void(0);" id="menu-expend-button" style="display: none">
+                        <i class="feather-arrow-right"></i>
+                    </a>
+                </div>
+                 <!--! [End] nxl-navigation-toggle !-->
+                 <h2 style="padding-top:10px;">NEMINATH</h2>
+                <!--! [Start] nxl-lavel-mega-menu-toggle !-->
+               
+                <!--! [End] nxl-lavel-mega-menu-toggle !-->
+            </div>
+            <!--! [End] Header Left !-->
+            <!--! [Start] Header Right !-->
+            <div class="header-right ms-auto">
+                <div class="d-flex align-items-center">
+                   
+                    
+                    <div class="nxl-h-item d-none d-sm-flex">
+                        <div class="full-screen-switcher">
+                            <a href="javascript:void(0);" class="nxl-head-link me-0" onclick="$('body').fullScreenHelper('toggle');">
+                                <i class="feather-maximize maximize"></i>
+                                <i class="feather-minimize minimize"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="nxl-h-item dark-light-theme">
+                        <a href="javascript:void(0);" class="nxl-head-link me-0 dark-button">
+                            <i class="feather-moon"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="nxl-head-link me-0 light-button" style="display: none">
+                            <i class="feather-sun"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="dropdown nxl-h-item">
+                        <a class="nxl-head-link me-3" data-bs-toggle="dropdown" href="#" role="button" data-bs-auto-close="outside">
+                            <i class="feather-bell"></i>
+                            <span class="badge bg-danger nxl-h-badge">3</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end nxl-h-dropdown nxl-notifications-menu">
+                            <div class="d-flex justify-content-between align-items-center notifications-head">
+                                <h6 class="fw-bold text-dark mb-0">Notifications</h6>
+                                <a href="javascript:void(0);" class="fs-11 text-success text-end ms-auto" data-bs-toggle="tooltip" title="Make as Read">
+                                    <i class="feather-check"></i>
+                                    <span>Make as Read</span>
+                                </a>
+                            </div>
+                            <div class="notifications-item">
+                                <img src="{% static 'assets/images/avatar/2.png' %}" alt="" class="rounded me-3 border">
+                                <div class="notifications-desc">
+                                    <a href="javascript:void(0);" class="font-body text-truncate-2-line"> <span class="fw-semibold text-dark">Karthick Production</span> We should talk about that at lunch!</a>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="notifications-date text-muted border-bottom border-bottom-dashed">2 minutes ago</div>
+                                        <div class="d-flex align-items-center float-end gap-2">
+                                            <a href="javascript:void(0);" class="d-block wd-8 ht-8 rounded-circle bg-gray-300" data-bs-toggle="tooltip" title="Make as Read"></a>
+                                            <a href="javascript:void(0);" class="text-danger" data-bs-toggle="tooltip" title="Remove">
+                                                <i class="feather-x fs-12"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notifications-item">
+                                <img src="{% static 'assets/images/avatar/3.png' %}" alt="" class="rounded me-3 border">
+                                <div class="notifications-desc">
+                                   <a href="javascript:void(0);" class="font-body text-truncate-2-line"> <span class="fw-semibold text-dark">Karthick Accounts</span> You can download the latest invoices now.</a>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="notifications-date text-muted border-bottom border-bottom-dashed">36 minutes ago</div>
+                                        <div class="d-flex align-items-center float-end gap-2">
+                                            <a href="javascript:void(0);" class="d-block wd-8 ht-8 rounded-circle bg-gray-300" data-bs-toggle="tooltip" title="Make as Read"></a>
+                                            <a href="javascript:void(0);" class="text-danger" data-bs-toggle="tooltip" title="Remove">
+                                                <i class="feather-x fs-12"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notifications-item">
+                                <img src="{% static 'assets/images/avatar/4.png' %}" alt="" class="rounded me-3 border">
+                                <div class="notifications-desc">
+                                    <a href="javascript:void(0);" class="font-body text-truncate-2-line"> <span class="fw-semibold text-dark">Arokia cleament</span> Don't forget to maintain the machines</a>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="notifications-date text-muted border-bottom border-bottom-dashed">53 minutes ago</div>
+                                        <div class="d-flex align-items-center float-end gap-2">
+                                            <a href="javascript:void(0);" class="d-block wd-8 ht-8 rounded-circle bg-gray-300" data-bs-toggle="tooltip" title="Make as Read"></a>
+                                            <a href="javascript:void(0);" class="text-danger" data-bs-toggle="tooltip" title="Remove">
+                                                <i class="feather-x fs-12"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center notifications-footer">
+                                <a href="javascript:void(0);" class="fs-13 fw-semibold text-dark">All Notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                  <div class="dropdown nxl-h-item">
+                        <a href="{% url 'logout' %}" class="dropdown-item" style="color:black;font-weight:bold;">
+                            <i class="feather-log-out"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!--! [End] Header Right !-->
+        </div>
+    </header>
+    <!--! ================================================================ !-->
+    <!--! [End] Header !-->
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+    <!--! [Start] Main Content !-->
+    <!--! ================================================================ !-->
+    
+    <main class="nxl-container apps-container apps-tasks">
+        <div class="nxl-content without-header nxl-full-content">
+            <!-- [ Main Content ] start -->
+            <div class="main-content d-flex">
+                <!-- [ Content Sidebar ] start -->
+                <div class="content-sidebar content-sidebar-md" data-scrollbar-target="#psScrollbarInit">
+                    <div class="content-sidebar-header bg-white sticky-top hstack justify-content-between">
+                        <h4 class="fw-bolder mb-0">Tasks</h4>
+                        <a href="javascript:void(0);" class="app-sidebar-close-trigger d-flex">
+                            <i class="feather-x"></i>
+                        </a>
+                    </div>
+                    <div class="content-sidebar-header">
+                        <a href="" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addNewTasks">
+                            <i class="feather-plus me-2"></i>
+                            <span>Add Tasks</span>
+                        </a>
+                    </div>
+                    <div class="content-sidebar-body">
+                        <ul class="nav flex-column nxl-content-sidebar-item">
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <i class="feather-list"></i>
+                                    <span>New</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <i class="feather-watch"></i>
+                                    <span>Pending</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <i class="feather-activity"></i>
+                                    <span>Inprogress</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <i class="feather-check-circle"></i>
+                                    <span>Completed</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav flex-column nxl-content-sidebar-item">
+                            <li class="px-4 my-2 fs-10 fw-bold text-uppercase text-muted text-spacing-1 d-flex align-items-center justify-content-between">
+                                <span>Priority</span>
+                                <a href="javascript:void(0);">
+                                    <span class="avatar-text avatar-sm" data-bs-toggle="tooltip" data-bs-trigger="hover" title="Add New"> <i class="feather-plus"></i> </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <span class="wd-7 ht-7 bg-dark rounded-circle"></span>
+                                    <span>Low</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <span class="wd-7 ht-7 bg-success rounded-circle"></span>
+                                    <span>Normal</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <span class="wd-7 ht-7 bg-primary rounded-circle"></span>
+                                    <span>Medium</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <span class="wd-7 ht-7 bg-warning rounded-circle"></span>
+                                    <span>High</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="javascript:void(0);">
+                                    <span class="wd-7 ht-7 bg-danger rounded-circle"></span>
+                                    <span>Urgent</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- [ Content Sidebar  ] end -->
+                <!-- [ Main Area  ] start -->
+                <div class="content-area" data-scrollbar-target="#psScrollbarInit">
+                    <div class="content-area-header sticky-top">
+                        <div class="page-header-left d-flex align-items-center gap-2">
+                            <a href="javascript:void(0);" class="app-sidebar-open-trigger me-2">
+                                <i class="feather-align-left fs-20"></i>
+                            </a>
+                            <div class="dropdown">
+                                <a href="javascript:void(0)" class="btn btn-light-brand dropdown-toggle" data-bs-toggle="dropdown" data-bs-offset="0,16">
+                                    <i class="feather-check-circle me-2"></i>
+                                    <span>My Tasks</span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        <i class="feather-hash"></i>
+                                        <span>All Tasks</span>
+                                    </a>
+                                    <a class="dropdown-item active" href="javascript:void(0)">
+                                        <i class="feather-check-circle"></i>
+                                        <span>My Tasks</span>
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        <i class="feather-airplay"></i>
+                                        <span>Overviews</span>
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        <i class="feather-clock"></i>
+                                        <span>Pending Tasks</span>
+                                    </a>
+                                    <a class="dropdown-item" href="javascript:void(0)">
+                                        <i class="feather-activity"></i>
+                                        <span>InProgress Tasks</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-header-right ms-auto">
+                            <div class="hstack gap-2">
+                                <div class="hstack">
+                                    <a href="javascript:void(0)" class="search-form-open-toggle">
+                                        <div class="avatar-text avatar-md" data-bs-toggle="tooltip" data-bs-trigger="hover" title="Search">
+                                            <i class="feather-search"></i>
+                                        </div>
+                                    </a>
+                                    <form class="search-form" style="display: none">
+                                        <div class="search-form-inner">
+                                            <a href="javascript:void(0)" class="search-form-close-toggle">
+                                                <div class="avatar-text avatar-md" data-bs-toggle="tooltip" data-bs-trigger="hover" title="Search Close">
+                                                    <i class="feather-arrow-left"></i>
+                                                </div>
+                                            </a>
+                                            <input type="search" class="py-3 px-0 border-0 w-100" id="tasksSearch" placeholder="Search...">
+                                        </div>
+                                    </form>
+                                </div>
+                                <a href="javascript:void(0)" class="d-none d-sm-flex">
+                                    <div class="avatar-text avatar-md" data-bs-toggle="tooltip" data-bs-trigger="hover" title="Newest">
+                                        <i class="feather-chevron-left"></i>
+                                    </div>
+                                </a>
+                                <a href="javascript:void(0)" class="d-none d-sm-flex">
+                                    <div class="avatar-text avatar-md" data-bs-toggle="tooltip" data-bs-trigger="hover" title="Oldest">
+                                        <i class="feather-chevron-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="{% if message.tags %}{{ message.tags }}-message{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="content-area-body">
+                        <div class="card stretch stretch-full">
+                            <a href="" class="card-header">
+                                <h5 class="mb-0">Today's Task Assigned</h5>
+                            </a>
+                            <div class="card-body collapse show" id="tasks_collapse_1">
+                                <ul class="list-unstyled mb-0">
+                                    {% if all_tasks %}
+                                        {% for i in all_tasks %}
+                                            <li class="single-task-list p-3 mb-3 border border-dashed rounded-3">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="d-flex align-items-center gap-3 me-3">
+                                                        <div class="custom-control custom-checkbox me-2">
+                                                            <input type="checkbox" class="custom-control-input" id="customCheckTask1" data-checked-action="task-action">
+                                                            <label class="custom-control-label c-pointer" for="customCheckTask1"></label>
+                                                        </div>
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <div class="lh-base"><i class="feather-star"></i></div>
+                                                            
+                                                                
+                                                                <a  href="{% url 'apps_tasks_id' i.id %}"  class="single-task-list-link" >
+                                                                    <div class="fs-12 fw-bold text-truncate-1-line">{{ i.name }}<span class="ms-2 badge bg-soft-danger text-danger">{{ i.status}}</span></div>
+                                                                    <div class="fs-12 fw-normal text-muted text-truncate-1-line">{{ i.description }}</div>
+                                                                </a>
+                                                           
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex flex-shrink-0 align-items-center gap-3">
+                                                        <div class="badge-container">
+                                                            <div class="badge bg-soft-primary text-primary d-md-inline-block d-none" data-tooltip="Target">{{ i.target }}</div>
+                                                            <div class="badge bg-teal text-primary d-md-inline-block d-none" data-tooltip="Machine">{{ i.machine }}</div>
+                                                            <div class="badge bg-gray-200 text-primary d-md-inline-block d-none" data-tooltip="Completed">{{ i.completed }}</div>
+                                                            <div class="badge bg-danger d-md-inline-block d-none" data-tooltip="Due">{{ i.due }}</div>
+                                                        </div>
+                                                        <div class="d-md-inline-block d-none me-3">{{ i.start_date|date:"d M, Y" }}</div>
+                                                        <div class="avatar-image avatar-md d-sm-inline-block d-none">
+                                                            <!-- <img src="{% static 'assets/images/avatar/1.png' %}" alt="user" class="img-fluid" title="{{ i.assignee.all.0.name }}"> -->
+                                                            <img src="{% static 'assets/images/avatar/1.png' %}" 
+                                                                alt="user" 
+                                                                class="img-fluid"
+                                                                title="{{i.assignee}}">
+                                                        </div>
+                                                        <div class="dropdown">
+                                                            <a href="javascript:void(0);" class="avatar-text avatar-md" data-bs-toggle="dropdown">
+                                                                <i class="feather-more-vertical"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu dropdown-menu-end">
+                                                                <a class="dropdown-item edit-task" href="{% url 'apps_tasks_update' i.id %}">Edit Task</a>
+                                                                <a class="dropdown-item view-task" href="{% url 'apps_tasks_id' i.id %}">View Task</a>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                    <p style="text-align: center;">NO LIVE TASKS</p>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- [ Content Area ] end -->
+            </div>
+            <!-- [ Main Content ] end -->
+        </div>
+    </main>
+    <!--! ================================================================ !-->
+    <!--! [End] Main Content !-->
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+    <!--! [Start] Add New task Modal !-->
+    <!--! ================================================================ !-->
+    <div class="modal fade" id="addNewTasks" tabindex="-1">
+        <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form action="{% url 'apps_tasks' %}" method="post" id="taskForm">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add New Task</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-4">
+                                <label for="taskName" class="form-label">Name</label>
+                                <input type="text" id="taskName" class="form-control" placeholder="Task Name" name="name" required>
+                                <small class="text-muted">Tasks name for your todo</small>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Note/Description</label>
+
+                                <textarea 
+                                    name="description" 
+                                    class="form-control" 
+                                    rows="4" 
+                                    maxlength="200" 
+                                    placeholder="Enter task description..."></textarea>
+
+                                <small class="text-muted">Note/Description max 200 characters</small>
+                            </div>
+                            <div id="taskDateRangeAdd" class="mb-4">
+                                <label class="form-label">Date Range:</label>
+                                <div class="input-group date input-daterange">
+                                    <input type="date" name="range-start" class="form-control" placeholder="Start date..." autocomplete="off" required>
+                                    <span class="input-group-text">to</span>
+                                    <input type="date" name="range-end" class="form-control" placeholder="End date..." autocomplete="off" required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Status:</label>
+                                <select class="form-control" data-select2-selector="status" name="status" required>
+                                    <option  data-bg="bg-gray-200" >New</option>
+                                    <option  data-bg="bg-primary" >Inprogress</option>
+                                    <option  data-bg="bg-secondary">Pending</option>
+                                    <option  data-bg="bg-success">Completed</option>
+                                    <option  data-bg="bg-danger">Rejected</option>
+                                    <option  data-bg="bg-warning">Upcoming</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Priority:</label>
+                                <select class="form-select form-control" data-select2-selector="priority" name="priority" required>
+                                    <option  data-bg="bg-primary">Low</option>
+                                    <option  data-bg="bg-teal">Normal</option>
+                                    <option  data-bg="bg-success">Medium</option>
+                                    <option  data-bg="bg-warning">High</option>
+                                    <option data-bg="bg-danger" selected>Urgent</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Assignee:</label>
+                                <select class="form-select form-control" data-select2-selector="status" name="assignee" required>
+                                    {% for emp in employees %}
+
+                                        <option value="{{ emp.id }}" data-bg="bg-teal">
+                                            {{ emp.name }}
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Machine:</label>
+                                <select class="form-select form-control" data-select2-selector="tag" name="machine" required>
+                                    <option  data-bg="bg-primary">Assembly Machine</option>
+                                    <option  data-bg="bg-teal">White Belt Sanding</option>
+                                    <option  data-bg="bg-success">Single Head Boring Machine (old)</option>
+                                    <option  data-bg="bg-warning" >Mortosing Old Machine</option>
+                                    <option  data-bg="bg-danger">Double ended Tenon Old Machine</option>
+                                    <option data-bg="bg-indigo">Rip Saw machine</option>
+                                    <option data-bg="bg-secondary">Edge sanding Machine(Final Sanding)</option>
+                                    <option data-bg="bg-soft-danger">Six Head Machine</option>
+                                    <option data-bg="bg-success">Buffing Machine</option>
+                                    <option data-bg="bg-teal">Three Head Boring Machine</option>
+                                    <option data-bg="bg-dark">Mortising Machine</option>
+                                    <option data-bg="bg-soft-primary">Double Ended Tenon Machine(Manual)</option>
+                                    <option data-bg="bg-warning">Brush sanding Machine(Final Sanding)</option>
+                                    <option data-bg="bg-indigo">Panel Saw</option>
+                                </select>  
+                            </div>
+                            <div class="mb-4">
+                                <label for="targetName" class="form-label">Target</label>
+                                <input type="text" id="targetName" class="form-control" placeholder="Target" name="target" required>
+                                <small class="text-muted">Give the Target for the Employee</small>
+                            </div>
+                            <div class="mb-4">
+                                    <label for="CompletedName" class="form-label">Completed</label>
+                                    <input type="text" id="CompletedName" class="form-control" value="0" name="completed" required>
+                                    <small class="text-muted">Don't touch this place.Only Employee wants to enter this Field.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger">Discard</button>
+                            <button type="submit" class="btn btn-primary">Add Task</button>
+                        </div>
+                    </form>
+                </div>
+            
+        </div>
+    </div>
+    <!--! ================================================================ !-->
+    <!--! [End] Add New task Modal !-->
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+   
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+
+    
+   
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+    <!--! BEGIN: Theme Customizer !-->
+    <!--! ================================================================ !-->
+    <div class="theme-customizer">
+        <div class="customizer-handle">
+            <a href="javascript:void(0);" class="cutomizer-open-trigger bg-primary">
+                <i class="feather-settings"></i>
+            </a>
+        </div>
+        <div class="customizer-sidebar-wrapper">
+            <div class="customizer-sidebar-header px-4 ht-80 border-bottom d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Theme Settings</h5>
+                <a href="javascript:void(0);" class="cutomizer-close-trigger d-flex">
+                    <i class="feather-x"></i>
+                </a>
+            </div>
+            <div class="customizer-sidebar-body position-relative p-4" data-scrollbar-target="#psScrollbarInit">
+                <!--! BEGIN: [Navigation] !-->
+                <div class="position-relative px-3 pb-3 pt-4 mt-3 mb-5 border border-gray-2 theme-options-set">
+                    <label class="py-1 px-2 fs-8 fw-bold text-uppercase text-muted text-spacing-2 bg-white border border-gray-2 position-absolute rounded-2 options-label" style="top: -12px">Navigation</label>
+                    <div class="row g-2 theme-options-items app-navigation" id="appNavigationList">
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-navigation-light" name="app-navigation" value="1" data-app-navigation="app-navigation-light" checked>
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-navigation-light">Light</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-navigation-dark" name="app-navigation" value="2" data-app-navigation="app-navigation-dark">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-navigation-dark">Dark</label>
+                        </div>
+                    </div>
+                </div>
+                <!--! END: [Navigation] !-->
+                <!--! BEGIN: [Header] !-->
+                <div class="position-relative px-3 pb-3 pt-4 mt-3 mb-5 border border-gray-2 theme-options-set mt-5">
+                    <label class="py-1 px-2 fs-8 fw-bold text-uppercase text-muted text-spacing-2 bg-white border border-gray-2 position-absolute rounded-2 options-label" style="top: -12px">Header</label>
+                    <div class="row g-2 theme-options-items app-header" id="appHeaderList">
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-header-light" name="app-header" value="1" data-app-header="app-header-light" checked>
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-header-light">Light</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-header-dark" name="app-header" value="2" data-app-header="app-header-dark">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-header-dark">Dark</label>
+                        </div>
+                    </div>
+                </div>
+                <!--! END: [Header] !-->
+                <!--! BEGIN: [Skins] !-->
+                <div class="position-relative px-3 pb-3 pt-4 mt-3 mb-5 border border-gray-2 theme-options-set">
+                    <label class="py-1 px-2 fs-8 fw-bold text-uppercase text-muted text-spacing-2 bg-white border border-gray-2 position-absolute rounded-2 options-label" style="top: -12px">Skins</label>
+                    <div class="row g-2 theme-options-items app-skin" id="appSkinList">
+                        <div class="col-6 text-center position-relative single-option light-button active">
+                            <input type="radio" class="btn-check" id="app-skin-light" name="app-skin" value="1" data-app-skin="app-skin-light">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-skin-light">Light</label>
+                        </div>
+                        <div class="col-6 text-center position-relative single-option dark-button">
+                            <input type="radio" class="btn-check" id="app-skin-dark" name="app-skin" value="2" data-app-skin="app-skin-dark">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-skin-dark">Dark</label>
+                        </div>
+                    </div>
+                </div>
+                <!--! END: [Skins] !-->
+                <!--! BEGIN: [Typography] !-->
+                <div class="position-relative px-3 pb-3 pt-4 mt-3 mb-0 border border-gray-2 theme-options-set">
+                    <label class="py-1 px-2 fs-8 fw-bold text-uppercase text-muted text-spacing-2 bg-white border border-gray-2 position-absolute rounded-2 options-label" style="top: -12px">Typography</label>
+                    <div class="row g-2 theme-options-items font-family" id="fontFamilyList">
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-lato" name="font-family" value="1" data-font-family="app-font-family-lato">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-lato">Lato</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-rubik" name="font-family" value="2" data-font-family="app-font-family-rubik">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-rubik">Rubik</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-inter" name="font-family" value="3" data-font-family="app-font-family-inter" checked>
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-inter">Inter</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-cinzel" name="font-family" value="4" data-font-family="app-font-family-cinzel">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-cinzel">Cinzel</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-nunito" name="font-family" value="6" data-font-family="app-font-family-nunito">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-nunito">Nunito</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-roboto" name="font-family" value="7" data-font-family="app-font-family-roboto">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-roboto">Roboto</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-ubuntu" name="font-family" value="8" data-font-family="app-font-family-ubuntu">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-ubuntu">Ubuntu</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-poppins" name="font-family" value="9" data-font-family="app-font-family-poppins">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-poppins">Poppins</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-raleway" name="font-family" value="10" data-font-family="app-font-family-raleway">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-raleway">Raleway</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-system-ui" name="font-family" value="11" data-font-family="app-font-family-system-ui">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-system-ui">System UI</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-noto-sans" name="font-family" value="12" data-font-family="app-font-family-noto-sans">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-noto-sans">Noto Sans</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-fira-sans" name="font-family" value="13" data-font-family="app-font-family-fira-sans">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-fira-sans">Fira Sans</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-work-sans" name="font-family" value="14" data-font-family="app-font-family-work-sans">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-work-sans">Work Sans</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-open-sans" name="font-family" value="15" data-font-family="app-font-family-open-sans">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-open-sans">Open Sans</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-maven-pro" name="font-family" value="16" data-font-family="app-font-family-maven-pro">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-maven-pro">Maven Pro</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-quicksand" name="font-family" value="17" data-font-family="app-font-family-quicksand">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-quicksand">Quicksand</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-montserrat" name="font-family" value="18" data-font-family="app-font-family-montserrat">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-montserrat">Montserrat</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-josefin-sans" name="font-family" value="19" data-font-family="app-font-family-josefin-sans">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-josefin-sans">Josefin Sans</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-ibm-plex-sans" name="font-family" value="20" data-font-family="app-font-family-ibm-plex-sans">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-ibm-plex-sans">IBM Plex Sans</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-source-sans-pro" name="font-family" value="5" data-font-family="app-font-family-source-sans-pro">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-source-sans-pro">Source Sans Pro</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-montserrat-alt" name="font-family" value="21" data-font-family="app-font-family-montserrat-alt">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-montserrat-alt">Montserrat Alt</label>
+                        </div>
+                        <div class="col-6 text-center single-option">
+                            <input type="radio" class="btn-check" id="app-font-family-roboto-slab" name="font-family" value="22" data-font-family="app-font-family-roboto-slab">
+                            <label class="py-2 fs-9 fw-bold text-dark text-uppercase text-spacing-1 border border-gray-2 w-100 h-100 c-pointer position-relative options-label" for="app-font-family-roboto-slab">Roboto Slab</label>
+                        </div>
+                    </div>
+                </div>
+                <!--! END: [Typography] !-->
+            </div>
+            <div class="customizer-sidebar-footer px-4 ht-60 border-top d-flex align-items-center gap-2">
+                <div class="flex-fill w-50">
+                    <a href="javascript:void(0);" class="btn btn-danger" data-style="reset-all-common-style">Reset</a>
+                </div>
+                <div class="flex-fill w-50">
+                    <a href="#" target="_blank" class="btn btn-primary">Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--! ================================================================ !-->
+    <!--! [End] Theme Customizer !-->
+    <!--! ================================================================ !-->
+    <!--! ================================================================ !-->
+    <!--! Footer Script !-->
+    <!--! ================================================================ !-->
+    <!--! BEGIN: Vendors JS !-->
+    <script src="{% static 'assets/vendors/js/vendors.min.js' %}"></script>
+    <!-- vendors.min.js {always must need to be top} -->
+    <script src="{% static 'assets/vendors/js/select2.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/js/select2-active.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/js/quill.min.js' %}"></script>
+    <!--! END: Vendors JS !-->
+    <!--! BEGIN: Apps Init  !-->
+    <script src="{% static 'assets/js/common-init.min.js' %}"></script>
+    <!--! END: Apps Init !-->
+    <!--! BEGIN: Theme Customizer  !-->
+    <script src="{% static 'assets/js/theme-customizer-init.min.js' %}"></script>
+    <!--! END: Theme Customizer !-->
+    <!--! Checklist JS !-->
+    <!-- <script>
+        // Create a "close" button and append it to each list item
+        var myNodelist = document.querySelectorAll("#checklist> li");
+        var i;
+        for (i = 0; i < myNodelist.length; i++) {
+            var span = document.createElement("SPAN");
+            var txt = document.createTextNode("\u00D7");
+            span.className = "close";
+            span.appendChild(txt);
+            myNodelist[i].appendChild(span);
+        }
+
+        // Click on a close button to hide the current list item
+        var close = document.getElementsByClassName("close");
+        var i;
+        for (i = 0; i < close.length; i++) {
+            close[i].onclick = function() {
+                var div = this.parentElement;
+                div.style.display = "none";
+            };
+        }
+
+        // Add a "checked" symbol when clicking on a list item
+        var list = document.getElementById("checklist");
+        list.addEventListener(
+            "click",
+            function(ev) {
+                if (ev.target.tagName === "LI") {
+                    ev.target.classList.toggle("checked");
+                }
+            },
+            false
+        );
+
+        // Create a new list item when clicking on the "Add" button
+        function newElement() {
+            var li = document.createElement("li");
+            var inputValue = document.getElementById("checklistInput").value;
+            var t = document.createTextNode(inputValue);
+            li.appendChild(t);
+            if (inputValue === "") {
+                alert("You must write something!");
+            } else {
+                document.getElementById("checklist").appendChild(li);
+            }
+            document.getElementById("checklistInput").value = "";
+
+            var span = document.createElement("SPAN");
+            var txt = document.createTextNode("\u00D7");
+            span.className = "close";
+            span.appendChild(txt);
+            li.appendChild(span);
+
+            for (i = 0; i < close.length; i++) {
+                close[i].onclick = function() {
+                    var div = this.parentElement;
+                    div.style.display = "none";
+                };
+            }
+        }
+        
+        
+        
+    </script> -->
+</body>
+
+</html>

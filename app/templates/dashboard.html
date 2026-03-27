@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .success-message {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+
+            background: linear-gradient(135deg, #d1fae5, #ecfdf5);
+            color: #065f46;
+            border: 1px solid #10b981;
+
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+
+            animation: slideFade 0.5s ease;
+            position: relative;
+        }
+
+        /* Icon Circle */
+        .success-message::before {
+            content: "✔";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #10b981;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+        }
+        .error-message {
+            background: #e0f2fe;
+            color: #0369a1;
+            border-left: 5px solid #0ea5e9;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Animation */
+        @keyframes slideFade {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .no-tasks-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px; /* adjust as needed */
+            margin-top: 40px;
+        }
+
+        .no-tasks-card {
+            background: linear-gradient(135deg, #f0fdfa, #e0f2fe);
+            border-radius: 16px;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+            max-width: 400px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .no-tasks-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .no-tasks-card h3 {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 22px;
+            margin-bottom: 8px;
+            color: #065f46;
+        }
+
+        .no-tasks-card p {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 15px;
+            color: #047857;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            background-color: #10b981;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background-color: #059669;
+            transform: scale(1.05);
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    {% if task.status == 'Completed'%} 
+        <div class="no-tasks-container">
+            <div class="no-tasks-card">
+                <div class="no-tasks-icon">📋</div>
+                <h3>No Live Tasks</h3>
+                <p>Looks like you’re all caught up! Take a short break or check back later.</p>
+                <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+            </div>
+        </div>
+    {% else %}
+        <div class="container mt-4">
+
+            <h2 class="text-center mb-4">Employee & Task Dashboard</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "success" %}
+                        <div class="success-message">
+                            {{ message }}
+                        </div>
+                    {% elif message.tags == "error" %}
+                        <div class="error-message">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <!-- 🔹 Top Section -->
+            <div class="row">
+
+                <!-- LEFT: Employee -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            Employee Details
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Name:</strong> {{ employee.name }}</p>
+                            <p><strong>Email:</strong> {{ employee.email }}</p>
+                            <p><strong>Username:</strong> {{ employee.username }}</p>
+                            <p><strong>Designation:</strong> {{ employee.designation }}</p>
+                            <p><strong>Lead By:</strong> Karthick RaviShankar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Task -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            Task Details
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Name:</strong> {{ task.name }}</p>
+                            <p><strong>Description:</strong> {{ task.description }}</p>
+                            <p><strong>Start Date:</strong> {{ task.start_date }}</p>
+                            <p><strong>End Date:</strong> {{ task.end_date }}</p>
+                            <p><strong>Status:</strong> {{ task.status }}</p>
+                            <p><strong>Priority:</strong> {{ task.priority }}</p>
+                            <p><strong>Target:</strong> {{ task.target }}</p>
+                            <p><strong>Machine Used:</strong> {{ task.machine }}</p>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 🔻 Table Section -->
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    Work Progress Table
+                </div>
+
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped text-center align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Time Slot</th>
+                                        <th>Expected</th>
+                                        <th>Completed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in table_data %}
+                                    <tr>
+                                        <td>{{ row.time }}</td>
+                                        <td>{{ row.expected }}</td>
+                                        <td>
+                                            <!-- <input type="number" 
+                                                name="completed_{{ forloop.counter }}" 
+                                                class="form-control"
+                                                min="0"
+                                                placeholder="Enter"> -->
+                                                <input type="number" 
+                                                    name="completed_{{ forloop.counter }}" 
+                                                    class="form-control"
+                                                    value="{{ row.completed }}"
+                                                    min="0" placeholder="Enter" >
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+
+                            <!-- LEFT: Submit -->
+                            <button type="submit" class="btn btn-primary">
+                                Submit
+                            </button>
+
+                            <!-- RIGHT: Total -->
+                            <h5 class="mb-0">
+                                Total: <span class="badge bg-success">
+                                    {{ total_completed }}
+                                </span>
+                            </h5>
+
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+</body>
+</html>
