@@ -13,13 +13,13 @@ from django.contrib.auth.decorators import login_required
 
 
 #HomePage
-@login_required(login_url='auth_login_minimal')
+# @login_required(login_url='auth_login_minimal')
 def index(request):
     Productionmanager = ProductionManager.objects.get(id=1)
     target = Target.objects.filter(manager=Productionmanager).first()
     Productionprogress = ProductionProgress.objects.filter(target=target).first()
     
-    print(Productionprogress.containers_completed_count())
+    
     
 
     context = {"target":target,"Productionprogress":Productionprogress,"long_short_panel":(target.target_sets)*2,
