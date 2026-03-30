@@ -83,8 +83,9 @@ def apps_tasks(request,id=None):
        
     employees = Employee.objects.all()
     all_tasks = Task.objects.all()
-    all_machines = Machine.objects.all()
-    return render(request,'apps-tasks.html',{"employees":employees,"all_tasks":all_tasks,"machine":all_machines})
+    all_mech = Machine.objects.all()
+    print(all_mech)
+    return render(request,'apps-tasks.html',{"employees":employees,"all_tasks":all_tasks,"all_mech":all_mech})
 
 @login_required(login_url='auth_login_minimal')
 def apps_tasks_seen(request,id):
@@ -154,7 +155,9 @@ def apps_tasks_update(request, id):
 
 
 def dashboard(request, username):
+    print(request.session.get("username"))
     if request.session.get("username")!=None:
+        print(True)
         employee = get_object_or_404(Employee, username=username)
         task = get_object_or_404(Task, assignee=employee)
         print(request.session.get('username'))

@@ -31,14 +31,12 @@ class Machine(models.Model):
 class Task(models.Model):
 
     STATUS_CHOICES = [
-        ('inprogress', 'Inprogress'),
+        ('New', 'New'),
         ('pending', 'Pending'),
         ('completed', 'Completed'),
-        ('rejected', 'Rejected'),
     ]
 
     PRIORITY_CHOICES = [
-        ('low', 'Low'),
         ('normal', 'Normal'),
         ('medium', 'Medium'),
         ('high', 'High'),
