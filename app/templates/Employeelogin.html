@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Employee Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
 
@@ -139,12 +140,48 @@
             </div>
         {% endif %}
 
-        <form method="post">
+        <!-- <form method="post">
             {% csrf_token %}
             <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" class="form-control" id="PasswordInput" name="password" placeholder="Password" required>
+            <span class="input-group-text" style="cursor:pointer;" onclick="togglePassword()">
+                 <i id="eyeIcon" class="fa fa-eye"></i>
+            </span>
+            <button type="submit">Login</button>
+        </form> -->
+        <form method="post">
+            {% csrf_token %}
+            
+            <input type="text" name="username" placeholder="Username" required>
+
+            <div style="position: relative; width:320px">
+                <input type="password" id="PasswordInput" name="password" placeholder="Password" required >
+
+                <span onclick="togglePassword()" 
+                    style="position: absolute;right:10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
+                    <i id="eyeIcon" class="fa fa-eye"></i>
+                </span>
+            </div>
+
             <button type="submit">Login</button>
         </form>
     </div>
 </body>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById("PasswordInput");
+            const eyeIcon = document.getElementById("eyeIcon");
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text"; // show password
+                eyeIcon.classList.remove("feather-eye");
+                eyeIcon.classList.add("feather-eye-off");
+            } else {
+                passwordField.type = "password"; // hide password
+                eyeIcon.classList.remove("feather-eye-off");
+                eyeIcon.classList.add("feather-eye");
+            }
+        }
+    </script>
 </html>
