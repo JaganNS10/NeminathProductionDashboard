@@ -49,7 +49,7 @@ def apps_tasks(request,id=None):
         target = request.POST.get("target")
         completed = request.POST.get("completed")
         assignees = request.POST.get("assignee")
-        take_machine = get_object_or_404(Machine,name=machine)
+        take_machine = get_object_or_404(Machine,id=machine)
             
             
         # start_date_obj = datetime.strptime(start_date, "%m/%d/%Y").date()
@@ -83,8 +83,8 @@ def apps_tasks(request,id=None):
        
     employees = Employee.objects.all()
     all_tasks = Task.objects.all()
-    
-    return render(request,'apps-tasks.html',{"employees":employees,"all_tasks":all_tasks})
+    all_machines = Machine.objects.all()
+    return render(request,'apps-tasks.html',{"employees":employees,"all_tasks":all_tasks,"machine":all_machines})
 
 @login_required(login_url='auth_login_minimal')
 def apps_tasks_seen(request,id):

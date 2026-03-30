@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ProductionManager, Target, ProductionProgress
+from .models import ProductionManager, Target, ProductionProgress,Task,TaskHistory,Machine,Employee
 
 @admin.register(ProductionManager)
 class ProductionManagerAdmin(admin.ModelAdmin):
@@ -65,4 +65,8 @@ class TargetAdmin(admin.ModelAdmin):
                 status = "⏳ In Progress"
             return status
     
-    
+admin.site.register(Employee)
+admin.site.register(Machine)
+admin.site.register(Task)
+admin.site.register(TaskHistory)
+admin.site.register(ProductionProgress)

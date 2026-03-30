@@ -592,17 +592,13 @@
                                 <label class="form-label">Status:</label>
                                 <select class="form-control" data-select2-selector="status" name="status" required>
                                     <option  data-bg="bg-gray-200" >New</option>
-                                    <option  data-bg="bg-primary" >Inprogress</option>
                                     <option  data-bg="bg-secondary">Pending</option>
                                     <option  data-bg="bg-success">Completed</option>
-                                    <option  data-bg="bg-danger">Rejected</option>
-                                    <option  data-bg="bg-warning">Upcoming</option>
                                 </select>
                             </div>
                             <div class="form-group mb-4">
                                 <label class="form-label">Priority:</label>
                                 <select class="form-select form-control" data-select2-selector="priority" name="priority" required>
-                                    <option  data-bg="bg-primary">Low</option>
                                     <option  data-bg="bg-teal">Normal</option>
                                     <option  data-bg="bg-success">Medium</option>
                                     <option  data-bg="bg-warning">High</option>
@@ -625,20 +621,13 @@
                             <div class="form-group mb-0">
                                 <label class="form-label">Machine:</label>
                                 <select class="form-select form-control" data-select2-selector="tag" name="machine" required>
-                                    <option  data-bg="bg-primary">Assembly Machine</option>
-                                    <option  data-bg="bg-teal">White Belt Sanding</option>
-                                    <option  data-bg="bg-success">Single Head Boring Machine (old)</option>
-                                    <option  data-bg="bg-warning" >Mortosing Old Machine</option>
-                                    <option  data-bg="bg-danger">Double ended Tenon Old Machine</option>
-                                    <option data-bg="bg-indigo">Rip Saw machine</option>
-                                    <option data-bg="bg-secondary">Edge sanding Machine(Final Sanding)</option>
-                                    <option data-bg="bg-soft-danger">Six Head Machine</option>
-                                    <option data-bg="bg-success">Buffing Machine</option>
-                                    <option data-bg="bg-teal">Three Head Boring Machine</option>
-                                    <option data-bg="bg-dark">Mortising Machine</option>
-                                    <option data-bg="bg-soft-primary">Double Ended Tenon Machine(Manual)</option>
-                                    <option data-bg="bg-warning">Brush sanding Machine(Final Sanding)</option>
-                                    <option data-bg="bg-indigo">Panel Saw</option>
+                                    {% for i in all_machines %}
+
+                                        <option value="{{ i.id }}" data-bg="bg-danger">
+                                            {{ i.name }}
+                                        </option>
+
+                                    {% endfor %}
                                 </select>  
                             </div>
                             <div class="mb-4">

@@ -445,11 +445,9 @@
                                     <label class="form-label">Status:</label>
                                     <select class="form-control" data-select2-selector="status" name="status">
                                         <option  data-bg="bg-teal" {% if task.status == "New" %}selected{% endif %}>New</option>
-                                        <option  data-bg="bg-primary" {% if task.status == "Inprogress" %}selected{% endif %}>Inprogress</option>
                                         <option  data-bg="bg-secondary" {% if task.status == "Pending" %}selected{% endif %} >Pending</option>
                                         <option  data-bg="bg-success" {% if task.status == "Completed" %}selected{% endif %}>Completed</option>
-                                        <option data-bg="bg-danger" {% if task.status == "Rejected" %}selected{% endif %}>Rejected</option>
-                                        <option  data-bg="bg-warning" {% if task.status == "Upcoming" %}selected{% endif %}>Upcoming</option>
+                                        
                                     </select>
                                 </div>
                             </div>
@@ -457,7 +455,6 @@
                                 <div class="form-group mb-4">
                                     <label class="form-label">Priority:</label>
                                     <select class="form-select form-control" data-select2-selector="status" name="priority">
-                                        <option  data-bg="bg-primary" {% if task.priority == "low" %}selected{% endif %}>Low</option>
                                         <option  data-bg="bg-teal" {% if task.priority == "normal" %}selected{% endif %}>Normal</option>
                                         <option  data-bg="bg-success" {% if task.priority == "medium" %}selected{% endif %}>Medium</option>
                                         <option  data-bg="bg-warning" {% if task.priority == "high" %}selected{% endif %}>High</option>
@@ -482,7 +479,6 @@
                                     <label class="form-label">Assignee:</label>
                                     <select class="form-select form-control" data-select2-selector="status" name="assignee">
                                         
-
                                             <option value="{{ task.assignee }}" data-bg="bg-teal" selected>
                                                 {{ task.assignee }}
                                             </option>
