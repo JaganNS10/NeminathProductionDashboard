@@ -5,7 +5,7 @@ from datetime import datetime, date, timedelta
 
 class Employee(models.Model):
     name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(blank=True,null=True)
     username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=128)
     designation = models.CharField(max_length=100)
@@ -57,6 +57,7 @@ class Task(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
     target = models.BigIntegerField()
     completed = models.BigIntegerField(default=0)
+    remark = models.TextField(blank=True, null=True)
     due = models.BigIntegerField(default=0)
     completed_data = models.TextField(default="{}")
     created_at = models.DateTimeField(auto_now_add=True)

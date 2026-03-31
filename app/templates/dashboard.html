@@ -130,7 +130,7 @@
     </style>
 </head>
 <body class="bg-light">
-    {% if task.status == 'Completed'%} 
+    {% if task.status == 'Completed' or task_status == "Completed" %} 
         <div class="no-tasks-container">
             <div class="no-tasks-card">
                 <div class="no-tasks-icon">📋</div>

@@ -159,125 +159,131 @@ def dashboard(request, username):
     if request.session.get("username")!=None:
         print(True)
         employee = get_object_or_404(Employee, username=username)
+        print(True)
         task = get_object_or_404(Task, assignee=employee)
-        print(request.session.get('username'))
-        time_slots = [
-            "9:20 - 10:00",
-            "10:00 - 11:00",
-            "11:15 - 12:00",
-            "12:00 - 1:00",
-            "1:45 - 3:00",
-            "3:00 - 4:00",
-            "4:15 - 5:00",
-            "5:00 - 6:00",
-            "6:00 - 6:50",
-        ]
-
-        # ✅ Expected calculation
-        slots_count = len(time_slots)
-        target = task.target or 0
-        base = target // slots_count
-        remainder = target % slots_count
-
-        expected_values = [
-            base + 1 if i < remainder else base
-            for i in range(slots_count)
-        ]
-
-        # ✅ Load JSON safely
-        if task.completed_data:
-            try:
-                completed_data = json.loads(task.completed_data)
-            except json.JSONDecodeError:
-                completed_data = eval(task.completed_data)  # Fix old bad data
-        else:
-            completed_data = {}
-
-        # ✅ Handle POST
-        if request.method == "POST":
-            for i, slot in enumerate(time_slots, start=1):
-                value = request.POST.get(f"completed_{i}")
-                completed_data[slot] = int(value) if value else 0
-
-            # ✅ Calculate AFTER update
-            total_completed = sum(completed_data.values())
-
-            # ✅ Save JSON properly
-            task.completed_data = json.dumps(completed_data)
-            task.completed = total_completed
-
-            # 🎯 Messages
-            tasks_completed_words = [
-                "Excellent work! Your dedication keeps Neminath Wood Industry growing strong 🌳",
-                "Target achieved! Your hard work builds strength 💪",
-                "Great job! Task completed on time 👏",
-                "Outstanding performance! 🔥",
-                "Success comes from effort 👍",
-                "Well done! 🚀",
+        if task:
+            print(True)
+            print(request.session.get('username'))
+            time_slots = [
+                "9:20 - 10:00",
+                "10:00 - 11:00",
+                "11:15 - 12:00",
+                "12:00 - 1:00",
+                "1:45 - 3:00",
+                "3:00 - 4:00",
+                "4:15 - 5:00",
+                "5:00 - 6:00",
+                "6:00 - 6:50",
             ]
 
-            tasks_due_words = [
-                "Don’t worry — improve tomorrow 💪",
-                "Try again, you can do it 👍",
-                "Keep pushing forward 🔥",
-                "Come back stronger!",
-                "Stay focused 🚀",
+            # ✅ Expected calculation
+            slots_count = len(time_slots)
+            target = task.target or 0
+            base = target // slots_count
+            remainder = target % slots_count
+
+            expected_values = [
+                base + 1 if i < remainder else base
+                for i in range(slots_count)
             ]
 
-            # ✅ Status logic
-            last_slot = time_slots[-1]  # "6:00 - 6:50"
-            print(last_slot)
-            last_slot_value = completed_data.get(last_slot, 0)
-            print(type(last_slot_value))
-            if total_completed >= task.target:
-                task.due = 0
-                task.status = "Completed"
-                total_completed = sum(completed_data.values())
-                task.completed = total_completed
-                task.completed_data = {}
-                task.save()
-                del request.session['username']
-                messages.success(
-                    request,
-                    f"Hello {task.assignee}, target {task.target} completed 🎉 "
-                    f"{random.choice(tasks_completed_words)}.We will get back to you soon. if any tasks are avaliable."
-                )
-                return redirect('employee_login')
+            # ✅ Load JSON safely
+            if task.completed_data:
+                try:
+                    completed_data = json.loads(task.completed_data)
+                except json.JSONDecodeError:
+                    completed_data = eval(task.completed_data)  # Fix old bad data
             else:
-                if last_slot_value!=0:
-                    task.due = task.target - total_completed
-                    task.status = "Pending"
+                completed_data = {}
+
+            # ✅ Handle POST
+            if request.method == "POST":
+                for i, slot in enumerate(time_slots, start=1):
+                    value = request.POST.get(f"completed_{i}")
+                    completed_data[slot] = int(value) if value else 0
+
+                # ✅ Calculate AFTER update
+                total_completed = sum(completed_data.values())
+
+                # ✅ Save JSON properly
+                task.completed_data = json.dumps(completed_data)
+                task.completed = total_completed
+
+                # 🎯 Messages
+                tasks_completed_words = [
+                    "Excellent work! Your dedication keeps Neminath Wood Industry growing strong 🌳",
+                    "Target achieved! Your hard work builds strength 💪",
+                    "Great job! Task completed on time 👏",
+                    "Outstanding performance! 🔥",
+                    "Success comes from effort 👍",
+                    "Well done! 🚀",
+                ]
+
+                tasks_due_words = [
+                    "Don’t worry — improve tomorrow 💪",
+                    "Try again, you can do it 👍",
+                    "Keep pushing forward 🔥",
+                    "Come back stronger!",
+                    "Stay focused 🚀",
+                ]
+
+                # ✅ Status logic
+                last_slot = time_slots[-1]  # "6:00 - 6:50"
+                print(last_slot)
+                last_slot_value = completed_data.get(last_slot, 0)
+                print(type(last_slot_value))
+                if total_completed >= task.target:
+                    task.due = 0
+                    task.status = "Completed"
+                    total_completed = sum(completed_data.values())
+                    task.completed = total_completed
+                    task.completed_data = {}
                     task.save()
                     del request.session['username']
-                    messages.error(
+                    messages.success(
                         request,
-                        f"Hello {task.assignee}, Thank Your for your response. we appriciate your time and effort. Your Target is {task.target} but you successgfully completed {task.completed}. {random.choice(tasks_due_words)} We will get back to you soon. if any tasks are avaliable."
+                        f"Hello {task.assignee}, target {task.target} completed 🎉 "
+                        f"{random.choice(tasks_completed_words)}.We will get back to you soon. if any tasks are avaliable."
                     )
                     return redirect('employee_login')
+                else:
+                    if last_slot_value!=0:
+                        task.due = task.target - total_completed
+                        task.status = "Pending"
+                        task.save()
+                        del request.session['username']
+                        messages.error(
+                            request,
+                            f"Hello {task.assignee}, Thank Your for your response. we appriciate your time and effort. Your Target is {task.target} but you successgfully completed {task.completed}. {random.choice(tasks_due_words)} We will get back to you soon. if any tasks are avaliable."
+                        )
+                        return redirect('employee_login')
 
-            task.save()
+                task.save()
 
-        # ✅ Always recalc for GET + POST
-        total_completed = sum(completed_data.values())
+            # ✅ Always recalc for GET + POST
+            total_completed = sum(completed_data.values())
 
-        # ✅ Table data
-        table_data = [
-            {
-                "time": slot,
-                "expected": expected_values[i],
-                "completed": completed_data.get(slot, 0),
+            # ✅ Table data
+            table_data = [
+                {
+                    "time": slot,
+                    "expected": expected_values[i],
+                    "completed": completed_data.get(slot, 0),
+                }
+                for i, slot in enumerate(time_slots)
+            ]
+
+            context = {
+                "employee": employee,
+                "task": task,
+                "table_data": table_data,
+                "total_completed": total_completed,
             }
-            for i, slot in enumerate(time_slots)
-        ]
 
-        context = {
-            "employee": employee,
-            "task": task,
-            "table_data": table_data,
-            "total_completed": total_completed,
-        }
-
-        return render(request, "dashboard.html", context)
+            return render(request, "dashboard.html", context)
+        else:
+            context = {"task_status":"Completed"}
+            return render(request,"dashboard.html",context)
     else:
         messages.error(request,'Oops you are not authorized to this Employee.Pls login')
         return redirect('employee_login')
