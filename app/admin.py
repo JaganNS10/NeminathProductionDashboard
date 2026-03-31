@@ -86,6 +86,21 @@ class EmployeeAdmin(admin.ModelAdmin):
 class TaskAdmin(admin.ModelAdmin):
     # Fields to display in the list view
     list_display = ('name','assignee','machine','target','completed','due','remark')
+    def save_model(self, request, obj, form, change):
+        # Save the Task first
+        super().save_model(request, obj, form, change)
+
+        # Check if status changed to 'completed'
+        if change and 'status' in form.changed_data and obj.status == 'Completed':
+            TaskHistory.objects.create(
+                employee=obj.assignee,
+                machine=obj.machine,
+                task_name=obj.name,
+                target=obj.target,
+                completed=obj.completed,
+                due=obj.due,
+                task_date=obj.start_date
+            )
 
 class TaskHistoryAdmin(admin.ModelAdmin):
     list_display = ('employee','machine','task_name','target','completed','due','task_date')
