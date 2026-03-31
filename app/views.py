@@ -160,9 +160,11 @@ def dashboard(request, username):
         print(True)
         employee = get_object_or_404(Employee, username=username)
         print(True)
-        task = get_object_or_404(Task, assignee=employee)
+        task = Task.objects.filter(assignee=employee)
+        print(task)
         if task:
             print(True)
+            task = get_object_or_404(Task, assignee=employee)
             print(request.session.get('username'))
             time_slots = [
                 "9:20 - 10:00",
