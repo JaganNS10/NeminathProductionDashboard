@@ -1,9 +1,20 @@
 from django.contrib import admin
 from .models import ProductionManager, Target, ProductionProgress,Task,TaskHistory,Machine,Employee
 
+
+
+
+
+# Change admin site header, title, and index title
+admin.site.site_header = "NeminathProduction Admin Panel"        # Top-left header
+admin.site.site_title = "Production Admin Portal"        # Browser tab title
+admin.site.index_title = "Welcome to NeminathProduction Admin Dashboard"  # Dashboard main page
+
+
+
 @admin.register(ProductionManager)
 class ProductionManagerAdmin(admin.ModelAdmin):
-    list_display = ['user', 'phone']
+    list_display = ['user', 'phone','email']
 
 class ProductionProgressInline(admin.StackedInline):
     model = ProductionProgress
@@ -65,8 +76,33 @@ class TargetAdmin(admin.ModelAdmin):
                 status = "⏳ In Progress"
             return status
     
-admin.site.register(Employee)
+
+
+
+class EmployeeAdmin(admin.ModelAdmin):
+    # Fields to display in the list view
+    list_display = ('name', 'phone', 'email', 'designation', 'status', 'created')
+
+class TaskAdmin(admin.ModelAdmin):
+    # Fields to display in the list view
+    list_display = ('name','assignee','machine','target','completed','due','remark')
+
+class TaskHistoryAdmin(admin.ModelAdmin):
+    list_display = ('employee','machine','task_name','target','completed','due','task_date')
+
+
+
+class ProductionProgressAdmin(admin.ModelAdmin):
+    list_display = ('target', 'long_panel', 'long_panel_balance',
+                    'short_panel', 'short_panel_balance',
+                    'mattress', 'mattress_balance',
+                    'completed_sets', 'containers_completed_count')
+
+
+
+# Register the model with the custom admin
+admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Machine)
-admin.site.register(Task)
-admin.site.register(TaskHistory)
-admin.site.register(ProductionProgress)
+admin.site.register(Task,TaskAdmin)
+admin.site.register(TaskHistory,TaskHistoryAdmin)
+admin.site.register(ProductionProgress,ProductionProgressAdmin)

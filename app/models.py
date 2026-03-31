@@ -140,6 +140,19 @@ class ProductionProgress(models.Model):
 
     # def container_completed(self):
     #     return self.completed_sets >= self.target.target_sets
+
+    @property
+    def long_panel_balance(self):
+        return self.target.long_panel_expected() - self.long_panel
+
+    @property
+    def short_panel_balance(self):
+        return self.target.short_panel_expected() - self.short_panel
+
+    @property
+    def mattress_balance(self):
+        return self.target.mattress_expected() - self.mattress
+
     def containers_completed_count(self):
         # 1 container = target.target_sets
         if self.target.target_sets == 0:
