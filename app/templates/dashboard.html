@@ -127,6 +127,39 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+                /* Styled Textarea for Remark */
+        .remark-box {
+            width: 100%;
+            max-width: 600px;        /* optional, limits width */
+            min-height: 100px;       /* makes it taller */
+            padding: 15px 20px;
+            border: 2px solid #10b981;  /* matches your success theme */
+            border-radius: 12px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            color: #065f46;
+            background: #ecfdf5;
+            resize: vertical;        /* allows vertical resizing only */
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Focus effect */
+        .remark-box:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Optional label styling */
+        .remark-label {
+            display: block;
+            font-weight: 600;
+            color: #065f46;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', sans-serif;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -198,67 +231,71 @@
             </div>
 
             <!-- 🔻 Table Section -->
-            <div class="card mt-4 shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    Work Progress Table
-                </div>
+            <form method="POST">
+                <div class="card mt-4 shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        Work Progress Table
+                    </div>
 
-                <div class="card-body">
-                    <form method="POST">
-                        {% csrf_token %}
+                        <div class="card-body">
+                                {% csrf_token %}
 
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped text-center align-middle">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Time Slot</th>
-                                        <th>Expected</th>
-                                        <th>Completed</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for row in table_data %}
-                                    <tr>
-                                        <td>{{ row.time }}</td>
-                                        <td>{{ row.expected }}</td>
-                                        <td>
-                                            <!-- <input type="number" 
-                                                name="completed_{{ forloop.counter }}" 
-                                                class="form-control"
-                                                min="0"
-                                                placeholder="Enter"> -->
-                                                <input type="number" 
-                                                    name="completed_{{ forloop.counter }}" 
-                                                    class="form-control"
-                                                    value="{{ row.completed }}"
-                                                    min="0" placeholder="Enter" >
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped text-center align-middle">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Time Slot</th>
+                                                <th>Expected</th>
+                                                <th>Completed</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in table_data %}
+                                            <tr>
+                                                <td>{{ row.time }}</td>
+                                                <td>{{ row.expected }}</td>
+                                                <td>
+                                                    <!-- <input type="number" 
+                                                        name="completed_{{ forloop.counter }}" 
+                                                        class="form-control"
+                                                        min="0"
+                                                        placeholder="Enter"> -->
+                                                        <input type="number" 
+                                                            name="completed_{{ forloop.counter }}" 
+                                                            class="form-control"
+                                                            value="{{ row.completed }}"
+                                                            min="0" placeholder="Enter" >
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+
+                                    <!-- LEFT: Submit -->
+
+                                    <!-- RIGHT: Total -->
+                                    <h5 class="mb-0">
+                                        Total: <span class="badge bg-success">
+                                            {{ total_completed }}
+                                        </span>
+                                    </h5>
+
+                                </div>
+
                         </div>
-
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-
-                            <!-- LEFT: Submit -->
-                            <button type="submit" class="btn btn-primary">
-                                Submit
-                            </button>
-
-                            <!-- RIGHT: Total -->
-                            <h5 class="mb-0">
-                                Total: <span class="badge bg-success">
-                                    {{ total_completed }}
-                                </span>
-                            </h5>
-
-                        </div>
-
-                    </form>
                 </div>
-            </div>
-
+                <div class="mt-4 mb-4">
+                            <label for="remark" class="remark-label">Remark / Reason:</label>
+                            <textarea id="remark" name="remark" class="remark-box" 
+                             placeholder="Note Ask the permission from you production manager or if your reason is valid enter the reason.Enter reason why the target is not completed or you are assigned for another task."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin:20px 0;">
+                    Submit
+                </button>
+            </form>
         </div>
     {% endif %}
 </body>

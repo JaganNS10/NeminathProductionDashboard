@@ -145,6 +145,7 @@ def apps_tasks_update(request, id):
         task.completed = 0
         task.completed_data = {}
         task.due = task.target
+        task.remark = ""
         task.save()
 
         messages.success(request, f"Task for the Employee {employee} updated successfully.")
@@ -210,6 +211,7 @@ def dashboard(request, username):
                 # ✅ Save JSON properly
                 task.completed_data = json.dumps(completed_data)
                 task.completed = total_completed
+                task.due = abs(task.target-task.completed)
 
                 # 🎯 Messages
                 tasks_completed_words = [
@@ -234,23 +236,38 @@ def dashboard(request, username):
                 print(last_slot)
                 last_slot_value = completed_data.get(last_slot, 0)
                 print(type(last_slot_value))
-                if total_completed >= task.target:
-                    task.due = 0
+                remark = request.POST.get("remark")
+                print("Remark:",remark)
+                if remark != "":
                     task.status = "Completed"
                     total_completed = sum(completed_data.values())
                     task.completed = total_completed
-                    task.completed_data = {}
+                    task.remark = remark
+                    task.due = abs(task.target - total_completed)
                     task.save()
                     del request.session['username']
                     messages.success(
-                        request,
-                        f"Hello {task.assignee}, target {task.target} completed 🎉 "
-                        f"{random.choice(tasks_completed_words)}.We will get back to you soon. if any tasks are avaliable."
+                    request,
+                            f"Hello {task.assignee}, Please wait for another task when the manager is assigned"
                     )
                     return redirect('employee_login')
+                
+                if total_completed >= task.target:
+                        task.status = "Completed"
+                        total_completed = sum(completed_data.values())
+                        task.completed = total_completed
+                        task.due = 0
+                        task.save()
+                        del request.session['username']
+                        messages.success(
+                            request,
+                            f"Hello {task.assignee}, target {task.target} completed 🎉 "
+                            f"{random.choice(tasks_completed_words)}.We will get back to you soon. if any tasks are avaliable."
+                        )
+                        return redirect('employee_login')
                 else:
                     if last_slot_value!=0:
-                        task.due = task.target - total_completed
+                        task.due = abs(task.target - total_completed)
                         task.status = "Pending"
                         task.save()
                         del request.session['username']
