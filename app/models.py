@@ -62,12 +62,31 @@ class Task(models.Model):
     completed_data = models.TextField(default="{}")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None  # Check if it's a new object
+
+        if not is_new:
+            # Fetch old record from DB
+            old_task = Task.objects.get(pk=self.pk)
+
+            # Check if status changed or relevant fields updated
+            if old_task.status != self.status and self.status in ['pending', 'completed']:
+                # Update due
+                self.due = self.target - self.completed
+
+                # Create history entry
+                TaskHistory.objects.create(
+                    employee=self.assignee,
+                    machine=self.machine,
+                    task_name=self.name,
+                    target=self.target,
+                    completed=self.completed,
+                    due=self.due
+                )
+
+        super().save(*args, **kwargs)
     def __str__(self):
         return self.name
-    
-   
-
-
 
 class TaskHistory(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
