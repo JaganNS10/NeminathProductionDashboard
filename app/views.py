@@ -534,3 +534,37 @@ def leads_delete(request,employee_id):
         return redirect('leads')
     
     return render(request,'leads-delete.html',{'get':get})
+
+
+
+
+def leaderboard_view(request):
+
+    def get_performers(designation):
+        employees = Employee.objects.filter(designation=designation)
+        data = []
+
+        for emp in employees:
+            tasks = TaskHistory.objects.filter(employee=emp)
+
+            total_target = sum(t.target for t in tasks)
+            total_completed = sum(t.completed for t in tasks)
+
+            percent = (total_completed / total_target * 100) if total_target > 0 else 0
+
+            data.append({
+                'employee': emp,
+                'percent': round(percent, 2)
+            })
+
+        # sort highest first
+        data.sort(key=lambda x: x['percent'], reverse=True)
+
+        return data
+
+    context = {
+        'machine_operators': get_performers('Machine Operator'),
+        'helpers': get_performers('Helper'),
+    }
+
+    return render(request, 'leaderboard.html', context)

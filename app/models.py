@@ -19,8 +19,6 @@ class Employee(models.Model):
 
 
 
-
-
 class Machine(models.Model):
     name = models.CharField(max_length=100, unique=True)
     
@@ -138,9 +136,6 @@ class Target(models.Model):
 
     def __str__(self):
         return f"{self.manager} - {self.target_sets} sets"
-
-
-
 
 class ProductionProgress(models.Model):
     target = models.OneToOneField(Target, on_delete=models.CASCADE)

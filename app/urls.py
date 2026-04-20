@@ -15,5 +15,6 @@ urlpatterns = [
     path('leads_view/<int:id>/',views.leads_view,name='leads_view'),   
     path('leads/',views.leads,name='leads'),
     path('leads_update/<int:employee_id>/',views.leads_update,name='leads_update'),
-    path('leads_delete/<int:employee_id>/',views.leads_delete,name='leads_delete')
+    path('leads_delete/<int:employee_id>/',views.leads_delete,name='leads_delete'),
+    path('Employeeoverallperformance/',views.leaderboard_view,name='leaderboard')
 ]
