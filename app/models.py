@@ -70,7 +70,7 @@ class Task(models.Model):
             old_task = Task.objects.get(pk=self.pk)
 
             # Check if status changed or relevant fields updated
-            if old_task.status != self.status and self.status in ['pending', 'completed']:
+            if self.status in ['pending', 'completed']:
                 # Update due
                 self.due = self.target - self.completed
 
