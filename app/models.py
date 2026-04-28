@@ -95,6 +95,7 @@ class TaskHistory(models.Model):
     due = models.BigIntegerField()
     task_date = models.DateField(auto_now_add=True)  # date task was taken
     created_at = models.DateTimeField(auto_now_add=True)
+    other_work = models.TextField(null=True,help_text="Enter the other works what employee done.please mention all the other works done by the employee.")
 
     @property
     def percentage(self):
@@ -137,7 +138,9 @@ class Target(models.Model):
     def __str__(self):
         return f"{self.manager} - {self.target_sets} sets"
 
+
 class ProductionProgress(models.Model):
+
     target = models.OneToOneField(Target, on_delete=models.CASCADE)
     
     long_panel = models.IntegerField(default=0)
@@ -175,3 +178,8 @@ class ProductionProgress(models.Model):
 
     def __str__(self):
         return f"Progress - {self.target.manager}"
+    
+
+
+
+
