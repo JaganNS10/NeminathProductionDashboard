@@ -1,0 +1,239 @@
+<style>
+body {
+  background: #f4f7fb;
+}
+
+/* Gradient Header */
+.gradient-header {
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  color: white;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+/* Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.3);
+  transition: 0.3s;
+}
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+}
+
+/* Metric colors */
+.metric-green { color: #10b981; font-weight: 600; }
+.metric-blue { color: #3b82f6; font-weight: 600; }
+.metric-orange { color: #f59e0b; font-weight: 600; }
+
+/* Badge style */
+.badge-soft {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* Buttons */
+.btn-modern {
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-weight: 500;
+}
+
+/* Table */
+.table-modern th {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+.table-modern td {
+  font-size: 13px;
+}
+</style>
+
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- 🔥 STYLE -->
+<style>
+body {
+  background: #f4f7fb;
+}
+
+/* Header */
+.gradient-header {
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  color: white;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+/* Glass Card */
+.glass-card {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.3);
+  transition: 0.3s;
+}
+.glass-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Buttons */
+.btn-modern {
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* Metrics */
+.metric-green { color: #10b981; font-weight: 600; }
+.metric-blue { color: #3b82f6; font-weight: 600; }
+.metric-orange { color: #f59e0b; font-weight: 600; }
+
+/* Table */
+.table-modern th {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+.table-modern td {
+  font-size: 13px;
+}
+</style>
+
+<div class="container py-4">
+
+  <!-- 🔥 HEADER -->
+  <div class="gradient-header d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <h4 class="fw-bold mb-1">
+        {% if selected_date == today %}
+          🚀 Today's Production
+        {% else %}
+          📅 {{ selected_date }} Production
+        {% endif %}
+      </h4>
+      <small>Production summary dashboard</small>
+    </div>
+
+    <div class="d-flex gap-2">
+      <input type="date" value="{{ selected_date }}"
+             class="form-control form-control-sm"
+             onchange="window.location.href='?date=' + this.value">
+
+      <a href="?date={{ today }}" class="btn btn-light btn-modern">Today</a>
+    </div>
+  </div>
+
+  <!-- 🚀 QUICK ACTIONS (ALL LINKS FIXED HERE) -->
+  <div class="glass-card p-3 mb-4 d-flex flex-wrap justify-content-between gap-2">
+
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'after_assembly' %}?date={{ selected_date }}"
+         class="btn btn-primary btn-modern">
+         After Assembly
+      </a>
+
+      {% for sheet in sidebar_sheets %}
+      <a href="{% url 'process_sheet' sheet.slug %}"
+         class="btn btn-outline-secondary btn-modern">
+         {{ sheet.display_name }}
+      </a>
+      {% endfor %}
+    </div>
+
+    <a href="{% url 'production_update' %}"
+       class="btn btn-dark btn-modern">
+       📊 Summary
+    </a>
+
+  </div>
+
+  {% if not has_data %}
+
+  <!-- EMPTY -->
+  <div class="glass-card text-center p-5">
+    <h5 class="text-muted">No Data Available 😴</h5>
+    <p class="text-muted small">Start adding production entries</p>
+  </div>
+
+  {% else %}
+
+    <!-- 🔥 AFTER ASSEMBLY (FULLY DYNAMIC) -->
+    {% for panel in assembly_summary %}
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-semibold">
+        {{ panel.panel }}
+      </div>
+
+      <div class="card-body p-0">
+        <table class="table mb-0 text-center">
+          <thead>
+            <tr>
+              {% for col in panel.columns %}
+                <th>{{ col.column_name }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              {% for col in panel.columns %}
+                <td>{{ col.quantity }}</td>
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- 🔥 PROCESS SUMMARY (ALL SHEETS) -->
+    <div class="row g-3">
+      {% for item in process_summary %}
+      <div class="col-md-6">
+
+        <div class="card shadow-sm h-100">
+          <div class="card-header d-flex justify-content-between">
+            <div>
+              <strong>{{ item.table_name }}</strong><br>
+              <small class="text-muted">{{ item.sheet }}</small>
+            </div>
+            <span class="badge bg-success">{{ item.total }}</span>
+          </div>
+
+          <div class="card-body p-0">
+            <table class="table mb-0">
+              <tbody>
+                {% for step in item.steps %}
+                <tr>
+                  <td>{{ step.step_name }}</td>
+                  <td class="text-muted">{{ step.machine_name }}</td>
+                  <td class="text-end">{{ step.quantity }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+  {% endif %}
+
+</div>
+
+
+{% endblock %}

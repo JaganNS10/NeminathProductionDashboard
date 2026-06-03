@@ -13,27 +13,13 @@ from django.contrib.auth.decorators import login_required
 
 
 #HomePage
-# @login_required(login_url='auth_login_minimal')
-def index(request):
-    Productionmanager = ProductionManager.objects.get(id=1)
-    target = Target.objects.filter(manager=Productionmanager).first()
-    Productionprogress = ProductionProgress.objects.filter(target=target).first()
-    
-    
-    
+# #@login_required(login_url='auth_login_minimal')
+# def index(request):
+#     return render(request,'index.html')
 
-    context = {"target":target,"Productionprogress":Productionprogress,"long_short_panel":(target.target_sets)*2,
-    }
-    return render(request,'index.html',context)
-
-
-
-
-
-    
     
 #apps-tasksPage
-@login_required(login_url='auth_login_minimal')
+#@login_required(login_url='auth_login_minimal')
 def apps_tasks(request,id=None):
     if request.method == "POST":
         employees = Employee.objects.all()
@@ -87,7 +73,7 @@ def apps_tasks(request,id=None):
     print(all_mech)
     return render(request,'apps-tasks.html',{"employees":employees,"all_tasks":all_tasks,"all_mech":all_mech})
 
-@login_required(login_url='auth_login_minimal')
+# @login_required(login_url='auth_login_minim0al')
 def apps_tasks_seen(request,id):
     task = get_object_or_404(Task,id=id)
     
@@ -112,7 +98,7 @@ def apps_tasks_seen(request,id):
     completed_list = [(slot, completed_dict.get(slot, 0)) for slot in time_slots]
     return render(request,'apps-tasks-seen.html',{"task":task,"completed_list":completed_list})
 
-@login_required(login_url='auth_login_minimal')
+#@login_required(login_url='auth_login_minimal')
 def apps_tasks_update(request, id):
     task = get_object_or_404(Task, id=id)
     machines = Machine.objects.all()
@@ -152,7 +138,6 @@ def apps_tasks_update(request, id):
         return redirect('apps_tasks')
 
     return render(request, 'apps-tasks-update.html', {"task": task, 'machines': machines})
-
 
 
 def dashboard(request, username):
@@ -362,7 +347,7 @@ def employee_login(request):
 
 
 #leads-createPage
-@login_required(login_url='auth_login_minimal')
+# #@login_required(login_url='auth_login_minimal')
 def leads_create(request):
     print("View Called")
     if request.method == "POST":
@@ -394,7 +379,7 @@ def leads_create(request):
             return redirect('leads_create')
     return render(request,'leads-create.html')
 
-@login_required(login_url='auth_login_minimal')
+#@login_required(login_url='auth_login_minimal')
 def leads_update(request, employee_id):
     # Fetch the employee object or return 404 if not found
     employee = get_object_or_404(Employee, id=employee_id)
@@ -435,7 +420,7 @@ def leads_update(request, employee_id):
     return render(request, 'leads-update.html', context)
 
 #leads-viewPage
-@login_required(login_url='auth_login_minimal')
+#@login_required(login_url='auth_login_minimal')
 def leads_view(request,id=None):
     if id:
         employee = Employee.objects.get(id=id)
@@ -483,7 +468,7 @@ def leads_view(request,id=None):
     else:
         return render(request,'leads-view.html')
 
-@login_required(login_url='auth_login_minimal')
+#@login_required(login_url='auth_login_minimal')
 def leads(request):
     import random
     employee = Employee.objects.all()
@@ -525,7 +510,7 @@ def leads(request):
         'percentage_New':percentage_New
     })
 
-@login_required(login_url='auth_login_minimal')
+#@login_required(login_url='auth_login_minimal')
 def leads_delete(request,employee_id):
     get = get_object_or_404(Employee,id=employee_id)
     if request.method == "POST":
@@ -534,8 +519,6 @@ def leads_delete(request,employee_id):
         return redirect('leads')
     
     return render(request,'leads-delete.html',{'get':get})
-
-
 
 
 def leaderboard_view(request):
@@ -568,3 +551,258 @@ def leaderboard_view(request):
     }
 
     return render(request, 'leaderboard.html', context)
+
+
+
+from datetime import date
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Sum
+from .models import DailyEntry,ProcessStep,ProcessTable,AssemblyPanel,AfterAssemblyEntry,Sheet, ProcessTable
+
+
+
+def base(request):
+    return render(request,'base.html')
+
+
+
+
+def production_update(request):
+    """
+    Summary of all After Assembly data (totals).
+    Fully dynamic based on panels & columns from admin.
+    """
+    panels = AssemblyPanel.objects.filter(is_active=True).prefetch_related('columns')
+
+    summary = []
+
+    for panel in panels:
+        columns_summary = []
+
+        for column in panel.columns.filter(is_active=True):
+            total = AfterAssemblyEntry.objects.filter(
+                column=column
+            ).aggregate(total=Sum('quantity'))['total'] or 0
+
+            columns_summary.append({
+                'column_name': column.column_name,
+                'total': total,
+            })
+
+        summary.append({
+            'panel_name': panel.name,
+            'columns': columns_summary,
+            'grand_total': sum(c['total'] for c in columns_summary),
+        })
+
+    return render(request, 'production_update.html', {
+        'summary': summary
+    })
+
+
+
+
+# -------------------------------------------------------
+# AFTER ASSEMBLY DATA SHEET — entry form for manager
+# -------------------------------------------------------
+
+# #@login_required(login_url='auth_login_minimal')
+def after_assembly(request):
+    today = date.today()
+    selected_date_str = request.GET.get('date', str(today))
+
+    try:
+        from datetime import datetime
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        selected_date = today
+
+    # Get all active panels with their columns — fully dynamic
+    panels = AssemblyPanel.objects.filter(is_active=True).prefetch_related('columns')
+
+    # Load existing entries for selected date
+    panel_data = []
+    for panel in panels:
+        columns_data = []
+        for column in panel.columns.filter(is_active=True):
+            try:
+                entry = AfterAssemblyEntry.objects.get(column=column, date=selected_date)
+                quantity = entry.quantity
+                remarks = entry.remarks
+            except AfterAssemblyEntry.DoesNotExist:
+                quantity = 0
+                remarks = ''
+            columns_data.append({
+                'column': column,
+                'quantity': quantity,
+                'remarks': remarks,
+            })
+        panel_data.append({
+            'panel': panel,
+            'columns': columns_data,
+        })
+
+    if request.method == 'POST':
+        selected_date_str = request.POST.get('date')
+        try:
+            from datetime import datetime
+            selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            selected_date = today
+
+        for panel in panels:
+            for column in panel.columns.filter(is_active=True):
+                qty = request.POST.get(f'column_{column.id}', 0)
+                qty = int(qty) if qty else 0
+                AfterAssemblyEntry.objects.update_or_create(
+                    column=column,
+                    date=selected_date,
+                    defaults={'quantity': qty}
+                )
+
+        messages.success(request, f'After Assembly data saved for {selected_date}.')
+        return redirect(f'/after-assembly/?date={selected_date}')
+
+    context = {
+        'panel_data': panel_data,
+        'selected_date': selected_date,
+    }
+    return render(request, 'after_assembly.html', context)
+
+def process_sheet(request, slug):
+    today = date.today()
+    selected_date_str = request.GET.get('date', str(today))
+
+    try:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        selected_date = today
+
+    # Get sheet
+    sheet = get_object_or_404(Sheet, slug=slug)
+
+    # ✅ FIXED HERE
+    tables = ProcessTable.objects.filter(
+        sheet=sheet,
+        is_active=True
+    ).prefetch_related('steps')
+
+    # Load existing entries
+    table_data = []
+    for table in tables:
+        steps_data = []
+        for step in table.steps.filter(is_active=True):
+            entry = DailyEntry.objects.filter(step=step, date=selected_date).first()
+            quantity = entry.quantity if entry else 0
+
+            steps_data.append({
+                'step': step,
+                'quantity': quantity
+            })
+
+        table_data.append({
+            'table': table,
+            'steps': steps_data
+        })
+
+    # Save
+    if request.method == 'POST':
+        selected_date_str = request.POST.get('date')
+        try:
+            selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            selected_date = today
+
+        for table in tables:
+            for step in table.steps.filter(is_active=True):
+                qty = request.POST.get(f'step_{step.id}', 0)
+                qty = int(qty) if qty else 0
+
+                DailyEntry.objects.update_or_create(
+                    step=step,
+                    date=selected_date,
+                    defaults={'quantity': qty}
+                )
+
+        messages.success(request, f'{sheet.display_name} data saved for {selected_date}.')
+        return redirect(f'/sheet/{sheet.slug}/?date={selected_date}')
+
+    return render(request, 'process_sheet.html', {
+        'table_data': table_data,
+        'selected_date': selected_date,
+        'sheet_title': sheet.display_name,
+        'sheet': sheet
+    })
+# WORK DONE TODAY — summary of all entries for today
+
+
+
+def work_done_today(request):
+    today = date.today()
+    selected_date_str = request.GET.get('date', str(today))
+
+    try:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        selected_date = today
+
+    # 🔥 ALL SHEETS
+    tables = ProcessTable.objects.filter(is_active=True).select_related('sheet').prefetch_related('steps')
+
+    process_summary = []
+
+    for table in tables:
+        steps_today = []
+
+        for step in table.steps.filter(is_active=True):
+            entry = step.entries.filter(date=selected_date).first()
+
+            if entry and entry.quantity > 0:
+                steps_today.append({
+                    'step_name': step.step_name,
+                    'machine_name': step.machine_name,
+                    'quantity': entry.quantity,
+                })
+
+        if steps_today:
+            process_summary.append({
+                'table_name': table.name,
+                'sheet': table.sheet.display_name,
+                'steps': steps_today,
+                'total': sum(s['quantity'] for s in steps_today),
+            })
+
+    # 🔥 ASSEMBLY
+    panels = AssemblyPanel.objects.filter(is_active=True).prefetch_related('columns')
+
+    assembly_summary = []
+
+    for panel in panels:
+        columns_today = []
+
+        for column in panel.columns.filter(is_active=True):
+            entry = column.entries.filter(date=selected_date).first()
+
+            if entry and entry.quantity > 0:
+                columns_today.append({
+                    'column_name': column.column_name,
+                    'quantity': entry.quantity,
+                    'remarks': entry.remarks,
+                })
+
+        if columns_today:
+            assembly_summary.append({
+                'panel': panel.name,
+                'columns': columns_today,
+                'total': sum(c['quantity'] for c in columns_today),
+            })
+
+    return render(request, 'work_done_today.html', {
+        'selected_date': selected_date,
+        'today': today,
+        'process_summary': process_summary,
+        'assembly_summary': assembly_summary,
+        'has_data': bool(process_summary or assembly_summary),
+    })

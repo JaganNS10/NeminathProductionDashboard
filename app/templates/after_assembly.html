@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+{% load dict_filters %}
+{% block page_title %}After Assembly Data{% endblock %}
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  .asm-wrap {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 2.5rem 2rem 5rem;
+    max-width: 2000px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ── */
+  .asm-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    gap: 1rem;
+  }
+
+  .asm-header-kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 8px;
+  }
+
+  .asm-header h4 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.03em;
+    margin: 0 0 4px;
+  }
+
+  .asm-header p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .asm-btn-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #374151;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 9px 16px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.18s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .asm-btn-view:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+    color: #111827;
+  }
+
+  /* ── Alerts ── */
+  .asm-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+    border: 1.5px solid transparent;
+  }
+  .asm-alert.success { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+  .asm-alert.error   { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+  .asm-alert.info    { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+  .asm-alert-close {
+    margin-left: auto; background: none; border: none;
+    cursor: pointer; color: inherit; font-size: 17px; line-height: 1; opacity: 0.5;
+  }
+  .asm-alert-close:hover { opacity: 1; }
+
+  /* ── Date Bar ── */
+  .asm-date-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  .asm-date-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    flex-shrink: 0;
+  }
+
+  .asm-date-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 7px 12px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .asm-date-input:focus {
+    border-color: #6366f1;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+  }
+
+  .asm-date-chip {
+    font-size: 13px;
+    color: #6b7280;
+    margin-left: 4px;
+  }
+  .asm-date-chip strong { color: #374151; font-weight: 600; }
+
+  /* ── Panel Cards ── */
+  .asm-panel {
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 16px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .asm-panel:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.1);
+  }
+
+  .asm-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 22px;
+    background: linear-gradient(to right, #fafafa, #f5f3ff08);
+    border-bottom: 1.5px solid #f3f4f6;
+    position: relative;
+  }
+  .asm-panel-header::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, #6366f1, #8b5cf6);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .asm-panel-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: #6366f1;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 6px;
+    padding: 3px 8px;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  .asm-panel-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    flex: 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── Table ── */
+  .asm-table-wrap { overflow-x: auto; }
+
+  .asm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .asm-table thead th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    padding: 11px 18px;
+    text-align: left;
+    background: #fafafa;
+    border-bottom: 1.5px solid #f3f4f6;
+    white-space: nowrap;
+  }
+
+  .asm-table tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f9fafb;
+    vertical-align: middle;
+  }
+  .asm-table tbody tr:last-child td { border-bottom: none; }
+  .asm-table tbody tr:hover td { background: #fafafe; }
+
+  .asm-input {
+    width: 100%;
+    min-width: 80px;
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    outline: none;
+    transition: all 0.18s;
+    text-align: right;
+    -moz-appearance: textfield;
+  }
+  .asm-input::-webkit-inner-spin-button,
+  .asm-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .asm-input::placeholder { color: #d1d5db; font-weight: 400; }
+  .asm-input:hover {
+    border-color: #d1d5db;
+    background: #fff;
+  }
+  .asm-input:focus {
+    border-color: #6366f1;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    color: #4f46e5;
+  }
+
+  /* ── Empty State ── */
+  .asm-empty {
+    background: #fff;
+    border: 1.5px dashed #e5e7eb;
+    border-radius: 16px;
+    text-align: center;
+    padding: 4rem 2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+  .asm-empty-icon {
+    width: 56px; height: 56px;
+    background: #f3f4f6;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .asm-empty p { font-size: 14px; color: #6b7280; margin-bottom: 16px; }
+  .asm-empty-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: #fff; background: #6366f1;
+    border: none; border-radius: 10px;
+    padding: 10px 20px; cursor: pointer; text-decoration: none;
+    transition: background 0.18s;
+  }
+  .asm-empty-btn:hover { background: #4f46e5; }
+
+  /* ── Save Footer ── */
+  .asm-save-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 1.75rem;
+  }
+
+  .asm-save-hint {
+    font-size: 12px;
+    color: #9ca3af;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .asm-btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+    transition: all 0.2s;
+  }
+  .asm-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.45);
+  }
+  .asm-btn-save:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+  }
+</style>
+
+<div class="asm-wrap">
+
+  <!-- Header -->
+  <div class="asm-header">
+    <div>
+      <div class="asm-header-kicker">Production · Daily Entry</div>
+      <h4>After Assembly Data</h4>
+      <p>Enter daily panel-level production data</p>
+    </div>
+    <a href="{% url 'work_done_today' %}?date={{ selected_date }}" class="asm-btn-view">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      View Today's Work
+    </a>
+  </div>
+
+  <!-- Django Messages -->
+  {% for message in messages %}
+  <div class="asm-alert {{ message.tags }}">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    {{ message }}
+    <button type="button" class="asm-alert-close" onclick="this.parentElement.style.display='none'">×</button>
+  </div>
+  {% endfor %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="date" value="{{ selected_date }}">
+
+    <!-- Date Picker -->
+    <div class="asm-date-bar">
+      <span class="asm-date-label">Date</span>
+      <input type="date" value="{{ selected_date }}" class="asm-date-input"
+             onchange="window.location.href='?date=' + this.value">
+      <span class="asm-date-chip">Showing data for <strong>{{ selected_date }}</strong></span>
+    </div>
+
+    <!-- Panel Tables -->
+    {% for item in panel_data %}
+    <div class="asm-panel">
+      <div class="asm-panel-header">
+        <span class="asm-panel-num">{{ forloop.counter|stringformat:"02d" }}</span>
+        <span class="asm-panel-name">{{ item.panel.name }}</span>
+      </div>
+      <div class="asm-table-wrap">
+        <table class="asm-table">
+          <thead>
+            <tr>
+              {% for col_data in item.columns %}
+              <th>{{ col_data.column.column_name }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {% for col_data in item.columns %}
+              <td>
+                <input type="number"
+                       name="column_{{ col_data.column.id }}"
+                       value="{{ col_data.quantity }}"
+                       class="asm-input"
+                       min="0" placeholder="0">
+              </td>
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% empty %}
+    <div class="asm-empty">
+      <div class="asm-empty-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8L2 7h20l-6-4z"/></svg>
+      </div>
+      <p>No panels found. Add panels from Django Admin.</p>
+      <a href="/admin/app/assemblypanel/add/" class="asm-empty-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Panel
+      </a>
+    </div>
+    {% endfor %}
+
+    {% if panel_data %}
+    <div class="asm-save-row">
+      <span class="asm-save-hint">{{ selected_date }}</span>
+      <button type="submit" class="asm-btn-save">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Data for {{ selected_date }}
+      </button>
+    </div>
+    {% endif %}
+
+  </form>
+</div>
+
+{% endblock %}

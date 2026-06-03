@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Neminath Production{% endblock %}</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Feather Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f6fb;
+      color: #1a1a2e;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      z-index: 1050;
+      transition: transform 0.3s ease;
+    }
+
+    #sidebar.collapsed {
+      transform: translateX(-240px);
+    }
+
+    .sidebar-brand {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-brand .brand-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .sidebar-brand .brand-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 2px;
+    }
+
+    .sidebar-brand .brand-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #4f8ef7, #7c5fdb);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 12px 20px 6px;
+    }
+
+    .sidebar-nav .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      color: rgba(255,255,255,0.6);
+      font-size: 13.5px;
+      font-weight: 500;
+      border-radius: 0;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .sidebar-nav .nav-link:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.07);
+    }
+
+    .sidebar-nav .nav-link.active {
+      color: #fff;
+      background: rgba(79, 142, 247, 0.18);
+      border-left: 3px solid #4f8ef7;
+    }
+
+    .sidebar-nav .nav-link svg {
+      width: 16px; height: 16px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 14px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-footer .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .sidebar-footer .user-role {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .sidebar-footer .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f8ef7, #7c5fdb);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* ── Top Navbar ── */
+    #topbar {
+      position: fixed;
+      top: 0;
+      left: 240px;
+      right: 0;
+      height: 58px;
+      background: #fff;
+      border-bottom: 1px solid #e8ecf4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 1040;
+      transition: left 0.3s ease;
+    }
+
+    #topbar.expanded {
+      left: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #555;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .topbar-page-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-icon-btn {
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      position: relative;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .topbar-icon-btn .badge-dot {
+      position: absolute;
+      top: 2px; right: 2px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 1.5px solid #fff;
+    }
+
+    .topbar-date {
+      font-size: 12px;
+      color: #9ca3af;
+      font-weight: 500;
+    }
+
+    /* ── Main Content ── */
+    #main-content {
+      margin-left: 240px;
+      margin-top: 58px;
+      min-height: calc(100vh - 58px);
+      padding: 0;
+      transition: margin-left 0.3s ease;
+    }
+
+    #main-content.expanded {
+      margin-left: 0;
+    }
+
+    /* ── Cards ── */
+    .card {
+      border-radius: 12px !important;
+      border: 1px solid #e8ecf4 !important;
+    }
+
+    .card-header {
+      border-radius: 12px 12px 0 0 !important;
+      border-bottom: 1px solid #e8ecf4 !important;
+    }
+
+    /* ── Alerts / Messages ── */
+    .alert {
+      border-radius: 10px;
+      font-size: 13.5px;
+    }
+
+    /* ── Tables ── */
+    .table thead th {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b7280;
+    }
+
+    .table tbody td {
+      font-size: 13.5px;
+      vertical-align: middle;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+    }
+
+    .btn-sm {
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    /* ── Form controls ── */
+    .form-control, .form-select {
+      font-size: 13.5px;
+      border-radius: 8px;
+      border-color: #d1d5db;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #4f8ef7;
+      box-shadow: 0 0 0 3px rgba(79,142,247,0.12);
+    }
+
+    /* ── Badges ── */
+    .badge {
+      font-weight: 500;
+      font-size: 11px;
+      border-radius: 6px;
+    }
+
+    /* ── Scrollbar ── */
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+    /* ── Mobile ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1045;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar { transform: translateX(-240px); }
+      #sidebar.mobile-open { transform: translateX(0); }
+      #topbar { left: 0; }
+      #main-content { margin-left: 0; }
+      .sidebar-overlay.active { display: block; }
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<!-- ── Sidebar Overlay (mobile) ── -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ════════════════════════════
+     SIDEBAR
+════════════════════════════ -->
+<nav id="sidebar">
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <i data-feather="layers" style="width:18px;height:18px;color:#fff;"></i>
+    </div>
+    <div class="brand-name">Neminath Wood</div>
+    <div class="brand-sub">Production Management</div>
+  </div>
+
+  <!-- Nav Links -->
+  <div class="sidebar-nav">
+
+    <div class="nav-section-label">Main</div>
+
+    <!-- <a href="#"
+       class="nav-link {% if request.resolver_match.url_name == 'Home' %}active{% endif %}">
+      <i data-feather="home"></i> Dashboard
+    </a> -->
+
+    <a href="{% url 'leads' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'leads' %}active{% endif %}">
+      <i data-feather="users"></i> Employees
+    </a>
+
+    <a href="{% url 'apps_tasks' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'apps_tasks' %}active{% endif %}">
+      <i data-feather="check-square"></i> Tasks
+    </a>
+
+    <a href="{% url 'leaderboard' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'leaderboard_view' %}active{% endif %}">
+      <i data-feather="award"></i> Leaderboard
+    </a>
+
+    
+    <div class="nav-section-label" style="margin-top:8px;">Production Plan</div>
+      <a href="{% url 'production_update' %}" class="nav-link {% if request.resolver_match.url_name == 'production_update' %}active{% endif %}"> <i data-feather="bar-chart-2"></i> Update Summary </a>
+      <a href="{% url 'after_assembly' %}" class="nav-link {% if request.resolver_match.url_name == 'after_assembly' %}active{% endif %}"> <i data-feather="layers"></i> After Assembly Data </a>
+      <a href="{% url 'work_done_today' %}" class="nav-link {% if request.resolver_match.url_name == 'work_done_today' %}active{% endif %}"> <i data-feather="clock"></i> Work Done Today </a>
+
+      {% for sheet in sidebar_sheets %}
+      <a href="{% url 'process_sheet' sheet.slug %}"
+        class="nav-link {% if request.resolver_match.kwargs.slug == sheet.slug %}active{% endif %}">
+        <i data-feather="grid"></i> {{ sheet.display_name }}
+      </a>
+      {% endfor %}
+        </div>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="d-flex align-items-center gap-2">
+      <div class="avatar">
+        {{ request.user.username|first|upper }}
+      </div>
+      <div>
+        <div class="user-name">{{ request.user.username }}</div>
+        <div class="user-role">Production Manager</div>
+      </div>
+      <a href="{% url 'logout' %}" class="ms-auto topbar-icon-btn" title="Logout">
+        <i data-feather="log-out" style="width:15px;height:15px;color:rgba(255,255,255,0.4);"></i>
+      </a>
+    </div>
+  </div>
+
+</nav>
+
+
+<!-- ════════════════════════════
+     TOP NAVBAR
+════════════════════════════ -->
+<header id="topbar">
+  <div class="topbar-left">
+    <!-- Sidebar Toggle -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+      <i data-feather="menu" style="width:20px;height:20px;"></i>
+    </button>
+
+    <!-- Page Title (dynamic per page) -->
+    <span class="topbar-page-title">{% block page_title %}Dashboard{% endblock %}</span>
+  </div>
+
+  <div class="topbar-right">
+    <!-- Current Date -->
+    <span class="topbar-date" id="topbarDate"></span>
+
+    <!-- Work Done Today shortcut -->
+    <a href="{% url 'work_done_today' %}" class="topbar-icon-btn" title="Work Done Today">
+      <i data-feather="clock" style="width:18px;height:18px;"></i>
+    </a>
+
+    <!-- User avatar -->
+    <div class="d-flex align-items-center gap-2">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4f8ef7,#7c5fdb);
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:13px;font-weight:700;color:#fff;">
+        {{ request.user.username|first|upper }}
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<!-- ════════════════════════════
+     MAIN CONTENT
+════════════════════════════ -->
+<main id="main-content">
+
+  <!-- Django Messages -->
+  {% if messages %}
+  <div class="px-4 pt-3">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+</main>
+
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Feather icons
+  feather.replace();
+
+  // Live date in topbar
+  function updateDate() {
+    const now = new Date();
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    document.getElementById('topbarDate').textContent = now.toLocaleDateString('en-IN', options);
+  }
+  updateDate();
+
+  // Sidebar toggle (desktop collapse)
+  let sidebarCollapsed = false;
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const topbar = document.getElementById('topbar');
+    const main = document.getElementById('main-content');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (window.innerWidth <= 768) {
+      // Mobile: slide in/out with overlay
+      sidebar.classList.toggle('mobile-open');
+      overlay.classList.toggle('active');
+    } else {
+      // Desktop: collapse
+      sidebarCollapsed = !sidebarCollapsed;
+      sidebar.classList.toggle('collapsed', sidebarCollapsed);
+      topbar.classList.toggle('expanded', sidebarCollapsed);
+      main.classList.toggle('expanded', sidebarCollapsed);
+    }
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+  }
+
+  // Active link highlighting
+  const currentPath = window.location.pathname;
+  document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      link.classList.add('active');
+    }
+  });
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime, date, timedelta
 
+from django.db import models
+from django.utils import timezone
+
 
 class Employee(models.Model):
     name = models.CharField(max_length=100)
@@ -88,7 +91,7 @@ class Task(models.Model):
 
 class TaskHistory(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE,null=True)
     task_name = models.CharField(max_length=200)
     target = models.BigIntegerField()
     completed = models.BigIntegerField()
@@ -181,5 +184,132 @@ class ProductionProgress(models.Model):
     
 
 
+
+
+
+# -------------------------------------------------------
+# SHEET TYPE — which sheet does this table belong to?
+# -------------------------------------------------------
+class Sheet(models.Model):
+    name = models.CharField(max_length=100)   # e.g. LSM, Strip
+    display_name = models.CharField(max_length=200)  # e.g. "L, S, M Sheet"
+    slug = models.SlugField(unique=True)  # e.g. lsm-sheet
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return self.display_name
+    
+
+
+
+
+# -------------------------------------------------------
+# ProcessTable — e.g. "Long Pcs 25MM Board"
+# Admin can add new tables from Django admin anytime.
+# -------------------------------------------------------
+class ProcessTable(models.Model):
+    name = models.CharField(max_length=200)  # e.g. "Long Pcs 25MM Board"
+    board_spec = models.CharField(max_length=100, blank=True, null=True)  # e.g. "25MM Board"
+    sheet = models.ForeignKey(Sheet, on_delete=models.CASCADE, related_name='tables')
+    order = models.PositiveIntegerField(default=0)  # display order
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'name']
+
+    # def __str__(self):
+    #     return f"{self.name} ({self.get_sheet_display()})"
+
+
+# -------------------------------------------------------
+# ProcessStep — each column inside a ProcessTable
+# e.g. "Cutting - Panel Saw", "Sanding - White Belt"
+# Admin can add new steps from Django admin anytime.
+# -------------------------------------------------------
+class ProcessStep(models.Model):
+    table = models.ForeignKey(ProcessTable, on_delete=models.CASCADE, related_name='steps')
+    step_name = models.CharField(max_length=200)    # e.g. "Cutting"
+    machine_name = models.CharField(max_length=200) # e.g. "Panel Saw"
+    order = models.PositiveIntegerField(default=0)  # column order
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.table.name} → {self.step_name} ({self.machine_name})"
+
+
+# -------------------------------------------------------
+# DailyEntry — the number entered by production manager
+# One record per (step, date)
+# -------------------------------------------------------
+class DailyEntry(models.Model):
+    step = models.ForeignKey(ProcessStep, on_delete=models.CASCADE, related_name='entries')
+    date = models.DateField()
+    quantity = models.IntegerField(default=0)
+    remarks = models.TextField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('step', 'date')  # one entry per step per day
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.step} | {self.date} | {self.quantity}"
+
+
+# -------------------------------------------------------
+# AfterAssemblyEntry — for the After Assembly Data sheet
+# Tracks Mattress / Long / Short panel daily progress
+# -------------------------------------------------------
+
+# Replace AfterAssemblyEntry with these two models
+
+class AssemblyPanel(models.Model):
+    """Admin can add new panels anytime — Mattress, Long, Short, After 1st Coat, etc."""
+    name = models.CharField(max_length=200)        # e.g. "After 1st Coat Painting"
+    order = models.PositiveIntegerField(default=0) # display order
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return self.name
+
+
+class AssemblyColumn(models.Model):
+    """Each column inside a panel table — also dynamic!"""
+    panel = models.ForeignKey(AssemblyPanel, on_delete=models.CASCADE, related_name='columns')
+    column_name = models.CharField(max_length=200)  # e.g. "Brushing / Sanding"
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.panel.name} → {self.column_name}"
+
+
+class AfterAssemblyEntry(models.Model):
+    """One value per (panel column, date)"""
+    column = models.ForeignKey(AssemblyColumn, on_delete=models.CASCADE, related_name='entries')
+    date = models.DateField()
+    quantity = models.IntegerField(default=0)
+    remarks = models.TextField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('column', 'date')
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.column} | {self.date} | {self.quantity}"
 
 

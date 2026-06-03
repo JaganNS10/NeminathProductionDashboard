@@ -1,0 +1,156 @@
+
+{% extends 'base.html' %}
+{% block page_title %}Production Update{% endblock %}
+{% block content %}
+
+<style>
+  .prod-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 2rem; }
+  .prod-stat { background: #f8f9fa; border-radius: 10px; padding: 1.1rem 1.2rem; }
+  .prod-stat-label { font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+  .prod-stat-value { font-size: 26px; font-weight: 600; color: #111; line-height: 1; }
+  .prod-stat-sub { font-size: 12px; color: #22c55e; margin-top: 5px; }
+
+  .panel-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 14px; margin-bottom: 1.25rem; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+  .panel-header { padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f4f4f4; }
+  .panel-name-pill { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; color: #111; }
+  .panel-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .grand-badge { background: #111; color: #fff; border-radius: 8px; padding: 4px 13px; font-size: 12px; font-weight: 500; }
+
+  .col-grid { display: grid; padding: 1rem 1.25rem; gap: 8px; }
+  .col-item { background: #f8f9fa; border-radius: 10px; padding: .75rem 1rem; }
+  .col-item-top { display: flex; justify-content: space-between; align-items: center; }
+  .col-name { font-size: 12px; color: #888; }
+  .col-val { font-size: 20px; font-weight: 600; }
+  .col-val.pos { color: #16a34a; }
+  .col-val.zero { color: #ccc; }
+  .bar-track { height: 4px; background: #e9ecef; border-radius: 2px; margin-top: 8px; }
+  .bar-fill { height: 4px; border-radius: 2px; }
+
+  .nav-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 1.5rem; }
+  .nav-card-link { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #f0f0f0; border-radius: 14px; padding: 1rem 1.25rem; text-decoration: none; color: inherit; box-shadow: 0 1px 3px rgba(0,0,0,.04); transition: box-shadow .15s, border-color .15s; }
+  .nav-card-link:hover { box-shadow: 0 4px 12px rgba(0,0,0,.07); border-color: #d0d0d0; }
+  .nav-icon-wrap { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-card-title { font-size: 14px; font-weight: 600; color: #111; }
+  .nav-card-sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+  @media (max-width: 768px) {
+    .prod-stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .col-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .nav-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="container-fluid py-4">
+
+  <!-- Top bar -->
+  <div class="d-flex align-items-start justify-content-between mb-4">
+    <div>
+      <h4 class="mb-1" style="font-weight:700;font-size:22px;color:#111;">Production Update</h4>
+      <p class="mb-0" style="font-size:13px;color:#888;">Auto-calculated summary from all assembly entries</p>
+    </div>
+    <a href="{% url 'work_done_today' %}" class="btn btn-dark btn-sm d-inline-flex align-items-center gap-2" style="border-radius:9px;font-size:13px;padding:8px 16px;">
+      <i data-feather="clock" style="width:13px;height:13px;"></i> Work Done Today
+    </a>
+  </div>
+
+  <!-- Summary stats -->
+  <div class="prod-stat-grid">
+    <div class="prod-stat">
+      <div class="prod-stat-label">Total today</div>
+      <div class="prod-stat-value">{{ total_today|default:"—" }}</div>
+      <div class="prod-stat-sub" style="color:#888;"></div>
+    </div>
+    <div class="prod-stat">
+      <div class="prod-stat-label">Panel types active</div>
+      <div class="prod-stat-value">{{ summary|length }}</div>
+    </div>
+    <div class="prod-stat">
+      <div class="prod-stat-label">Top panel</div>
+      <div class="prod-stat-value" style="font-size:17px;">{{ top_panel|default:"—" }}</div>
+    </div>
+    <div class="prod-stat">
+      <div class="prod-stat-label">Data entries</div>
+      <div class="prod-stat-value">{{ entry_count|default:"—" }}</div>
+    </div>
+  </div>
+
+  {% if summary %}
+
+  <p style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#aaa;margin-bottom:1rem;">Panel breakdown</p>
+
+  {% for item in summary %}
+  {% cycle '#16a34a' '#2563eb' '#d97706' '#9333ea' as panel_color silent %}
+  <div class="panel-card">
+    <div class="panel-header">
+      <div class="panel-name-pill">
+        <span class="panel-dot" style="background:{{ panel_color }};"></span>
+        {{ item.panel_name }}
+      </div>
+      <!-- <span class="grand-badge">Grand total: {{ item.grand_total }}</span> -->
+    </div>
+    <div class="col-grid" style="grid-template-columns: repeat({{ item.columns|length }}, 1fr);">
+      {% for col in item.columns %}
+      <div class="col-item">
+        <div class="col-item-top">
+          <span class="col-name">{{ col.column_name }}</span>
+          <span class="col-val {% if col.total > 0 %}pos{% else %}zero{% endif %}">{{ col.total }}</span>
+        </div>
+        <div class="bar-track">
+          {% if col.total > 0 %}
+          <div class="bar-fill" style="width:{{ col.pct|default:50 }}%;background:{{ panel_color }};"></div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  {% else %}
+  <div class="panel-card">
+    <div class="card-body text-center py-5">
+      <i data-feather="inbox" style="width:40px;height:40px;color:#ccc;"></i>
+      <p class="mt-3" style="color:#888;font-size:14px;">No data yet. Start entering daily assembly data.</p>
+      <a href="{% url 'after_assembly' %}" class="btn btn-dark btn-sm mt-2" style="border-radius:9px;">
+        Go to After Assembly
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Quick Nav -->
+  <!-- Quick Nav -->
+  <p style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#aaa;margin:2rem 0 1rem;">
+    Quick navigation
+  </p>
+
+  <div class="nav-row">
+
+    <!-- After Assembly (keep separate) -->
+    <a href="{% url 'after_assembly' %}" class="nav-card-link">
+      <div class="nav-icon-wrap" style="background:#dcfce7;">
+        <i data-feather="layers" style="width:16px;height:16px;color:#16a34a;"></i>
+      </div>
+      <div>
+        <div class="nav-card-title">After Assembly Data</div>
+        <div class="nav-card-sub">Enter daily panel data</div>
+      </div>
+    </a>
+
+    <!-- Dynamic Sheets -->
+    {% for sheet in sidebar_sheets %}
+    <a href="{% url 'process_sheet' sheet.slug %}" class="nav-card-link">
+      <div class="nav-icon-wrap" style="background:#dbeafe;">
+        <i data-feather="grid" style="width:16px;height:16px;color:#2563eb;"></i>
+      </div>
+      <div>
+        <div class="nav-card-title">{{ sheet.display_name }}</div>
+        <div class="nav-card-sub">Open sheet</div>
+      </div>
+    </a>
+    {% endfor %}
+
+  </div>
+</div>
+<script>feather.replace();</script>
+{% endblock %}
